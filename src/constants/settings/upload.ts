@@ -4,7 +4,7 @@ type UploadSettingType = {
 }
 
 export const audioUploadSetting: UploadSettingType = {
-  accept: ["audio/mp3", "audio/mpeg", "audio/ogg"],
+  accept: ["audio/mp3", "audio/mpeg"],
   maxSize: 262144000
 }
 

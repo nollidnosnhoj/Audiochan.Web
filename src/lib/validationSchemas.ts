@@ -76,9 +76,6 @@ export const editAudioSchema: SchemaOf<EditAudioRequest> = object().shape({
 }).defined();
 
 export const uploadAudioSchema: SchemaOf<UploadAudioRequest> = object().shape({
-  file: mixed()
-    .required(validationMessages.required("File"))
-    .defined(),
   title: string()
     .required(validationMessages.required("Title"))
     .max(30, validationMessages.max("Title", 30))

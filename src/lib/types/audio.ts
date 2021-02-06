@@ -32,7 +32,5 @@ export interface EditAudioRequest {
 };
 
 export interface UploadAudioRequest extends EditAudioRequest {
-  file: File | null,
-  image: File | null;
   acceptTerms: boolean
 }

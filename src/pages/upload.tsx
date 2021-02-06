@@ -1,6 +1,6 @@
 import React from "react";
-import AudioUpload from "~/components/Audio/Upload";
 import Page from "~/components/Shared/Page";
+import AudioUpload from "~/components/Audio/Upload";
 
 export default function UploadPage() {
   return (

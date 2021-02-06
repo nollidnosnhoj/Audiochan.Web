@@ -20,6 +20,20 @@ export function taggify(value: string) {
   });
 }
 
-export function getThumbnailUrl(url: string, size: 'large' | 'medium' | 'small' = 'large') {
-  return url.replace('_large', `_${size}`);
+export function objectToFormData(values: object): FormData {
+  var formData = new FormData();
+
+  Object.entries(values).forEach(([key, value]) => {
+    if (value) {
+      if (Array.isArray(value)) {
+        value.forEach((val) => formData.append(key, val));
+      } else if (value instanceof File) {
+        formData.append(key, value);
+      } else {
+        formData.append(key, value.toString());
+      }
+    }
+  });
+
+  return formData;
 }

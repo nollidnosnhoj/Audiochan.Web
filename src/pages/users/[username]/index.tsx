@@ -17,6 +17,7 @@ import { QueryClient } from "react-query";
 import { dehydrate } from "react-query/hydration";
 import Page from "~/components/Shared/Page";
 import Picture from "~/components/Shared/Picture";
+import PictureDropzone from "~/components/Shared/Picture/PictureDropzone";
 import AudioList from "~/components/Audio/List";
 import {
   fetchUserProfile,
@@ -26,7 +27,7 @@ import {
 } from "~/lib/services/users";
 import useUser from "~/lib/contexts/user_context";
 import { getAccessToken } from "~/utils/cookies";
-import PictureDropzone from "~/components/Shared/Picture/PictureDropzone";
+import { successfulToast } from "~/utils/toast";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const queryClient = new QueryClient();
