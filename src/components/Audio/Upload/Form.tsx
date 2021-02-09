@@ -3,7 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { EditAudioRequest, UploadAudioRequest } from "~/lib/types/audio";
 import { uploadAudioSchema } from "~/lib/validationSchemas";
 import { Controller, FormProvider, useForm } from "react-hook-form";
-import { Flex, Box, Spacer, Button } from "@chakra-ui/react";
+import { Flex, Box, Spacer, Button, Text } from "@chakra-ui/react";
 import { DevTool } from "@hookform/devtools";
 import InputCheckbox from "~/components/Form/Checkbox";
 import GenreSelect from "~/components/Form/GenreSelect";
@@ -11,7 +11,7 @@ import TagInput from "~/components/Form/TagInput";
 import TextInput from "~/components/Form/TextInput";
 
 interface AudioUploadFormProps {
-  file: File;
+  file?: File;
   onSubmit: (values: EditAudioRequest) => void;
 }
 
@@ -22,10 +22,7 @@ export default function AudioUploadForm(props: AudioUploadFormProps) {
 
   const methods = useForm<UploadAudioRequest>({
     defaultValues: {
-      title:
-        props.file.name.length > 30
-          ? props.file.name.substring(0, 29)
-          : props.file.name,
+      title: "",
       description: "",
       tags: [],
       isPublic: true,
@@ -51,7 +48,7 @@ export default function AudioUploadForm(props: AudioUploadFormProps) {
                 name="title"
                 type="text"
                 label="Title"
-                required
+                placeholder={props.file?.name}
                 disabled={isSubmitting}
               />
               <TextInput
@@ -85,16 +82,12 @@ export default function AudioUploadForm(props: AudioUploadFormProps) {
                 required
                 toggleSwitch
               />
-              <Flex marginY={4}>
-                <InputCheckbox
-                  name="acceptTerms"
-                  disabled={isSubmitting}
-                  required
-                >
-                  I agree to Audiochan's terms of service.
-                </InputCheckbox>
+              <Flex marginY={4} alignItems="center">
+                <Text>By uploading, you agree to our terms and service.</Text>
                 <Spacer />
-                <Button type="submit">Submit</Button>
+                <Button type="submit" disabled={!props.file}>
+                  Submit
+                </Button>
               </Flex>
             </Box>
           </form>

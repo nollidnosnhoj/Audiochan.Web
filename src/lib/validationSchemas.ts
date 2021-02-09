@@ -77,7 +77,6 @@ export const editAudioSchema: SchemaOf<EditAudioRequest> = object().shape({
 
 export const uploadAudioSchema: SchemaOf<UploadAudioRequest> = object().shape({
   title: string()
-    .required(validationMessages.required("Title"))
     .max(30, validationMessages.max("Title", 30))
     .defined(),
   description: string()
@@ -88,12 +87,7 @@ export const uploadAudioSchema: SchemaOf<UploadAudioRequest> = object().shape({
     .ensure()
     .defined(),
   genre: string()
-    .required(validationMessages.required("Genre"))
     .defined(),
   isPublic: boolean()
-    .defined(),
-  acceptTerms: boolean()
-    .required()
-    .oneOf([true], "You must accept terms of service.")
     .defined()
 }).defined();

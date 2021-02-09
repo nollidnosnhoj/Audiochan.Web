@@ -80,7 +80,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   };
 
   const onPlayPause = () => {
-    console.log("test");
     wavesurferRef.current?.playPause();
     setIsPlaying(wavesurferRef.current?.isPlaying() ?? false);
   };

@@ -1,10 +1,13 @@
-import { Box, Flex, Icon, Progress, Text, VStack } from "@chakra-ui/react";
+import { Box, Divider, Flex, Icon, Text, VStack } from "@chakra-ui/react";
 import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import SETTINGS from "~/constants/settings";
+import { EditAudioRequest } from "~/lib/types/audio";
 import { formatFileSize } from "~/utils/format";
 import { errorToast } from "~/utils/toast";
+import AudioUploadDropzone from "./Dropzone";
+import AudioUploadForm from "./Form";
 import AudioUploading from "./Uploading";
 
 interface AudioUploadProps {
@@ -13,67 +16,22 @@ interface AudioUploadProps {
 }
 
 export default function AudioUpload(props: AudioUploadProps) {
-  const {
-    maxFileSize = SETTINGS.UPLOAD.AUDIO.maxSize,
-    validContentTypes = SETTINGS.UPLOAD.AUDIO.accept,
-  } = props;
+  const [file, setFile] = useState<File | undefined>(undefined);
+  const [form, setForm] = useState<EditAudioRequest | undefined>(undefined);
 
-  const [file, setFile] = useState<File | null>(null);
-
-  const { getRootProps, getInputProps, isDragReject } = useDropzone({
-    multiple: false,
-    maxSize: maxFileSize,
-    accept: validContentTypes,
-    onDropAccepted: ([drop]) => {
-      setFile(drop);
-    },
-    onDropRejected: (fileRejections) => {
-      fileRejections.forEach((fileRejection) => {
-        fileRejection.errors.forEach((err) => {
-          errorToast({
-            title: "Invalid Audio",
-            message: err.message,
-          });
-        });
-      });
-    },
-  });
-
-  const borderColor = useMemo<string>(() => {
-    if (isDragReject) return "red.500";
-    return "gray.500";
-  }, [isDragReject]);
-
-  if (!file) {
-    return (
-      <Flex
-        {...getRootProps()}
-        justify="center"
-        align="center"
-        height="50vh"
-        borderRadius={4}
-        borderWidth={2}
-        borderStyle="dashed"
-        borderColor={borderColor}
-        cursor="pointer"
-      >
-        <Box>
-          <input {...getInputProps()} />
-          <VStack align="center" spacing={2}>
-            <Icon as={FaCloudUploadAlt} boxSize={50} />
-            <Text>Drop in an audio file or click to upload.</Text>
-            <Box textAlign="center" fontSize="xs" textColor="gray.500">
-              <Text>
-                Maximum file size:{" "}
-                {formatFileSize(SETTINGS.UPLOAD.AUDIO.maxSize)}
-              </Text>
-              <Text>We only accept .mp3 file. (for now)</Text>
-            </Box>
-          </VStack>
-        </Box>
-      </Flex>
-    );
+  if (file && form) {
+    return <AudioUploading file={file} form={form} />;
   }
 
-  return <AudioUploading file={file} />;
+  return (
+    <React.Fragment>
+      <AudioUploadDropzone
+        files={file ? [file] : []}
+        onDropAccepted={(files) => {
+          setFile(files[0]);
+        }}
+      />
+      <AudioUploadForm file={file} onSubmit={(values) => setForm(values)} />
+    </React.Fragment>
+  );
 }

@@ -68,7 +68,6 @@ const TagInput: React.FC<TagInputProps> = ({
     const taggifyTag = taggify(currentInput);
     if (!validateInput(taggifyTag)) return;
     const newValues = [...value, taggifyTag];
-    console.log("new values", newValues);
     onChange(newValues);
     setCurrentInput("");
     setInputError("");

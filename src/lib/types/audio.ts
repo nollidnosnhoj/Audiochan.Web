@@ -19,7 +19,7 @@ export type Audio = {
   isFavorited: boolean;
   created: string;
   updated?: string;
-  genre: string;
+  genre?: Genre;
   user: Creator;
   uploadId: string;
 }

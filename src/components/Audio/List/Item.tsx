@@ -51,7 +51,7 @@ const AudioListItem: React.FC<AudioListItemProps> = ({
         <Flex flex="1" justify="flex-end">
           <Stack direction="column" spacing={1} textAlign="right">
             <div>
-              <Badge>{audio.genre.name}</Badge>
+              <Badge>{audio.genre?.name}</Badge>
             </div>
             <div>
               <Text fontSize="sm">{formatDuration(audio.duration)}</Text>

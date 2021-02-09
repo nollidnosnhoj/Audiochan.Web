@@ -44,9 +44,9 @@ function mapAudioToModifyInputs(audio: Audio): EditAudioRequest {
   return {
     title: audio.title,
     description: audio.description,
-    tags: audio.tags.split(" "),
+    tags: audio.tags.split(" ").filter((tag) => tag.length > 0),
     isPublic: audio.isPublic,
-    genre: audio.genre.slug,
+    genre: audio.genre?.slug ?? "",
   };
 }
 

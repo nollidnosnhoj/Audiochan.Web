@@ -118,11 +118,7 @@ export const useCreateAudio = () => {
     return data;
   }
 
-  return useMutation(uploadAudio, {
-    onSuccess() {
-      queryClient.invalidateQueries(`audios`, { exact: true });
-    }
-  })
+  return useMutation(uploadAudio)
 }
 
 export const useEditAudio = (id: number) => {
