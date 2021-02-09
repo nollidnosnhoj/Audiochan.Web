@@ -26,19 +26,18 @@ import Router from "next/router";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import InputCheckbox from "../Form/Checkbox";
+import GenreSelect from "../Form/GenreSelect";
 import TextInput from "../Form/TextInput";
 import TagInput from "../Form/TagInput";
 import { Audio, EditAudioRequest } from "~/lib/types/audio";
 import { useEditAudio, useRemoveAudio } from "~/lib/services/audio";
 import { editAudioSchema } from "~/lib/validationSchemas";
 import { apiErrorToast, successfulToast } from "~/utils/toast";
-import GenreSelect from "../Form/GenreSelect";
 
 interface AudioEditProps {
-  model: Audio;
+  audio: Audio;
   isOpen: boolean;
   onClose: () => void;
-  isDev?: boolean;
 }
 
 function mapAudioToModifyInputs(audio: Audio): EditAudioRequest {
@@ -52,14 +51,14 @@ function mapAudioToModifyInputs(audio: Audio): EditAudioRequest {
 }
 
 const AudioEditModal: React.FC<AudioEditProps> = ({
-  model,
+  audio,
   isOpen,
   onClose,
-  isDev = false,
 }) => {
-  const currentValues = useMemo(() => mapAudioToModifyInputs(model), [model]);
-  const { mutateAsync: updateAudio } = useEditAudio(model.id);
-  const { mutateAsync: deleteAudio } = useRemoveAudio(model.id);
+  const { id: audioId } = audio;
+  const currentValues = useMemo(() => mapAudioToModifyInputs(audio), [audio]);
+  const { mutateAsync: updateAudio } = useEditAudio(audioId);
+  const { mutateAsync: deleteAudio } = useRemoveAudio(audioId);
   const [deleting, setDeleting] = useState(false);
 
   const methods = useForm<EditAudioRequest>({
@@ -81,16 +80,18 @@ const AudioEditModal: React.FC<AudioEditProps> = ({
 
   const onDeleteSubmit = async () => {
     setDeleting(true);
-    try {
-      await deleteAudio();
-      Router.push("/");
-      successfulToast({
-        title: "Audio deleted!",
+    deleteAudio()
+      .then(() => {
+        Router.push("/").then(() => {
+          successfulToast({
+            title: "Audio deleted!",
+          });
+        });
+      })
+      .catch((err) => {
+        apiErrorToast(err);
+        setDeleting(false);
       });
-    } catch (err) {
-      apiErrorToast(err);
-    }
-    setDeleting(false);
   };
 
   const onEditSubmit = async (inputs: EditAudioRequest) => {
@@ -105,20 +106,21 @@ const AudioEditModal: React.FC<AudioEditProps> = ({
       Object.assign(newRequest, inputs ?? {});
     }
 
-    try {
-      await updateAudio(newRequest);
-      successfulToast({ title: "Audio updated" });
-      onClose();
-    } catch (err) {
-      apiErrorToast(err);
-    }
+    updateAudio(newRequest)
+      .then(() => {
+        successfulToast({ title: "Audio updated" });
+        onClose();
+      })
+      .catch((err) => {
+        apiErrorToast(err);
+      });
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Edit '{model.title}'</ModalHeader>
+        <ModalHeader>Edit '{audio.title}'</ModalHeader>
         {!isSubmitting && <ModalCloseButton />}
         <ModalBody>
           <FormProvider {...methods}>
@@ -139,7 +141,6 @@ const AudioEditModal: React.FC<AudioEditProps> = ({
               <GenreSelect
                 name="genre"
                 placeholder="Select Genre"
-                required
                 disabled={isSubmitting}
               />
               <Controller

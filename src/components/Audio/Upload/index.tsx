@@ -1,4 +1,4 @@
-import { Box, Flex, Icon, Text, VStack } from "@chakra-ui/react";
+import { Box, Flex, Icon, Progress, Text, VStack } from "@chakra-ui/react";
 import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FaCloudUploadAlt } from "react-icons/fa";

@@ -4,7 +4,7 @@ import { Genre } from "~/lib/types/genre"
 export type AudioSearchType = 'audios' | 'favorites' | 'user' | 'feed'
 
 export type Audio = {
-  id: string;
+  id: number;
   title: string;
   description: string;
   isPublic: boolean;
@@ -19,8 +19,9 @@ export type Audio = {
   isFavorited: boolean;
   created: string;
   updated?: string;
-  genre: Genre,
+  genre: string;
   user: Creator;
+  uploadId: string;
 }
 
 export interface EditAudioRequest {

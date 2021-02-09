@@ -77,7 +77,7 @@ export const useAudiosPaginatedQuery = (options: useAudiosPaginatedOptions = { t
   return usePagination(key, fetchAudios, params);
 }
 
-export const useFavorite = (audioId: string, initialData?: boolean) => {
+export const useFavorite = (audioId: number, initialData?: boolean) => {
   const [isFavorite, setIsFavorite] = useState<boolean | undefined>(initialData);
 
   useEffect(() => {
@@ -125,7 +125,7 @@ export const useCreateAudio = () => {
   })
 }
 
-export const useEditAudio = (id: string) => {
+export const useEditAudio = (id: number) => {
   const queryClient = useQueryClient();
   const updateAudio = async (input: object) => {
     const { data } = await request<Audio>(`audios/${id}`, { method: 'patch', data: input });
@@ -140,7 +140,7 @@ export const useEditAudio = (id: string) => {
   })
 }
 
-export const useRemoveAudio = (id: string) => {
+export const useRemoveAudio = (id: number) => {
   const queryClient = useQueryClient();
   const removeAudio = async () => {
     return await request(`audios/${id}`, { method: 'delete' });
@@ -154,7 +154,7 @@ export const useRemoveAudio = (id: string) => {
   })
 }
 
-export const useAddAudioPicture = (id: string) => {
+export const useAddAudioPicture = (id: number) => {
   const queryClient = useQueryClient();
   const uploadArtwork = async (file: File) => {
     const formData = new FormData();

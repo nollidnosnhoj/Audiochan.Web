@@ -63,7 +63,6 @@ export default function AudioUploadForm(props: AudioUploadFormProps) {
               <GenreSelect
                 name="genre"
                 placeholder="Select Genre"
-                required
                 disabled={isSubmitting}
               />
               <Controller

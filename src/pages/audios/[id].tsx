@@ -97,7 +97,11 @@ export default function AudioDetailsPage(
       title={audio.title ?? "Removed"}
       beforeContainer={
         <Container>
-          <DynamicAudioPlayer audio={audio} isDev={props.isDevelopment} />
+          <DynamicAudioPlayer
+            uploadId={audio.uploadId}
+            isLoop={audio.isLoop}
+            duration={audio.duration}
+          />
         </Container>
       }
     >
@@ -115,9 +119,9 @@ export default function AudioDetailsPage(
                     await uploadArtwork(file);
                     setPicture(window.URL.createObjectURL(file));
                     successfulToast({
-                      title: 'Image successfully uploaded.',
-                      message: 'Image may take a couple minutes to update.'
-                    })
+                      title: "Image successfully uploaded.",
+                      message: "Image may take a couple minutes to update.",
+                    });
                   }}
                 />
               )}
@@ -140,7 +144,7 @@ export default function AudioDetailsPage(
           )}
         </Box>
       </Flex>
-      <AudioEdit model={audio} isOpen={isEditOpen} onClose={onEditClose} />
+      <AudioEdit audio={audio} isOpen={isEditOpen} onClose={onEditClose} />
     </Page>
   );
 }

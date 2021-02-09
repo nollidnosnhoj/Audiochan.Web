@@ -9,37 +9,49 @@ import { Box, Circle, Flex, Text } from "@chakra-ui/react";
 import { IoMdPlay, IoMdPause } from "react-icons/io";
 import WaveSurfer from "wavesurfer.js";
 import WaveSurferComponent from "~/components/Audio/Wavesurfer";
-import { formatDuration } from "~/utils/time";
 import { useAudioPlayer } from "~/lib/contexts/audio_player_context";
-import { Audio } from "~/lib/types/audio";
+import { formatDuration } from "~/utils/time";
 
-const AudioPlayer: React.FC<{
-  audio?: Audio;
+interface AudioPlayerProps {
+  uploadId: string;
+  duration: number;
+  isLoop?: boolean;
   color?: string;
-  isDev?: boolean;
-}> = ({ audio, color = "#ED64A6", isDev = true, ...props }) => {
-  if (!audio) return null;
+}
+
+const AudioPlayer: React.FC<AudioPlayerProps> = ({
+  uploadId,
+  duration,
+  color = "#ED64A6",
+  ...props
+}) => {
+  if (!uploadId) return null;
+
+  const audioUrl = useMemo(() => {
+    return `http://audiochan.s3.amazonaws.com/audios/${uploadId}/source.mp3`;
+  }, [uploadId]);
 
   const { volume, handleVolume } = useAudioPlayer();
-  const [loop, setLoop] = useState(audio.isLoop);
-  const [loaded, setLoaded] = useState(false);
-  const [loading, setLoading] = useState(0);
-  const [playing, setPlaying] = useState(false);
+  const [isLoop, isSetLoop] = useState(props.isLoop ?? false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const handleMount = useCallback(
     (ws: WaveSurfer) => {
       wavesurferRef.current = ws;
       if (wavesurferRef.current) {
-        wavesurferRef.current.load(audio.url);
+        wavesurferRef.current.load(audioUrl);
         wavesurferRef.current.on("ready", () => {
-          setLoaded(true);
+          console.log("audio ready");
+          setIsLoading(false);
         });
         wavesurferRef.current.on("volume", (level: number) => {
           handleVolume(level);
         });
         wavesurferRef.current.on("loading", (data: number) => {
-          setLoading(data);
+          setLoadingProgress(data);
         });
         wavesurferRef.current.on("seek", () => {
           if (wavesurferRef.current) {
@@ -53,12 +65,12 @@ const AudioPlayer: React.FC<{
         });
         wavesurferRef.current.on("finish", () => {
           setSeconds(0);
-          if (!loop) setPlaying(false);
+          if (!isLoop) setIsPlaying(false);
           else wavesurferRef.current?.play();
         });
       }
     },
-    [audio]
+    [audioUrl]
   );
 
   const handleUnmount = () => {
@@ -67,10 +79,11 @@ const AudioPlayer: React.FC<{
     if (wavesurferRef.current) wavesurferRef.current = null;
   };
 
-  const onPlayPause = useCallback(() => {
+  const onPlayPause = () => {
+    console.log("test");
     wavesurferRef.current?.playPause();
-    setPlaying(!playing);
-  }, [playing]);
+    setIsPlaying(wavesurferRef.current?.isPlaying() ?? false);
+  };
 
   useEffect(() => {
     if (wavesurferRef.current) {
@@ -95,9 +108,9 @@ const AudioPlayer: React.FC<{
             color="white"
             onClick={onPlayPause}
             as="button"
-            disabled={loaded === false}
+            disabled={isLoading === false && loadingProgress < 100}
           >
-            {playing ? <IoMdPause size="30px" /> : <IoMdPlay size="30px" />}
+            {isPlaying ? <IoMdPause size="30px" /> : <IoMdPlay size="30px" />}
           </Circle>
         </Flex>
         <Box width="80%">
