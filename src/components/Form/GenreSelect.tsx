@@ -5,13 +5,14 @@ import {
   Select,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { useFormContext } from "react-hook-form";
-import { ErrorMessage } from "@hookform/error-message";
 import { Genre } from "~/lib/types/genre";
 import fetch from "~/lib/fetcher";
 
 interface GenreSelectProps {
   name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent) => void;
+  error?: string;
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
@@ -19,11 +20,13 @@ interface GenreSelectProps {
 
 const GenreSelect: React.FC<GenreSelectProps> = ({
   name,
+  value,
+  onChange,
+  error,
   placeholder,
   required = false,
   disabled = false,
 }) => {
-  const { register, errors } = useFormContext();
   const [genres, setGenres] = useState<Genre[]>([]);
 
   useEffect(() => {
@@ -43,12 +46,13 @@ const GenreSelect: React.FC<GenreSelectProps> = ({
       paddingY={2}
       id={name}
       isRequired={required}
-      isInvalid={!!errors[name]}
+      isInvalid={!!error}
     >
       <FormLabel>Genre</FormLabel>
       <Select
         name={name}
-        ref={register}
+        value={value}
+        onChange={onChange}
         placeholder={placeholder}
         isDisabled={disabled}
       >
@@ -58,7 +62,7 @@ const GenreSelect: React.FC<GenreSelectProps> = ({
           </option>
         ))}
       </Select>
-      <ErrorMessage name={name} errors={errors} as={FormErrorMessage} />
+      <FormErrorMessage>{error}</FormErrorMessage>
     </FormControl>
   );
 };

@@ -1,5 +1,6 @@
 import { createStandaloneToast } from '@chakra-ui/react'
 import theme from '~/lib/theme'
+import { ErrorResponse } from '~/lib/types';
 import { isAxiosError } from './axios';
 
 const toast = createStandaloneToast({ theme: theme });
@@ -22,10 +23,19 @@ export function errorToast(options: {
 export function apiErrorToast(err: any) {
   let message = "An error has occured while processing request. Please try again later."
   let title = "API Error Occurred."
-  if (isAxiosError(err)) {
+  if (isAxiosError<ErrorResponse>(err)) {
     if (err?.response?.status === 401) return;
-    title = err?.response?.data.title ?? title
     message = err?.response?.data.message ?? message;
+    errorToast({ title, message })
+    if (err.response?.data.errors) {
+      Object.entries(err.response.data.errors).forEach(([key, errors]) => {
+        errorToast({
+          title: key,
+          message: errors.join('. ')
+        })
+      })
+    }
+    return;
   }
   errorToast({ title, message })
 }

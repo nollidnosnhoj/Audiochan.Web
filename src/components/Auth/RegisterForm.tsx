@@ -1,8 +1,7 @@
 import React from "react";
-import { Button, Checkbox, Flex } from "@chakra-ui/react";
-import { FormProvider, useForm } from "react-hook-form";
+import { Button, Flex, Text } from "@chakra-ui/react";
 import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { useFormik } from "formik";
 import TextInput from "../Form/TextInput";
 import { passwordRule, usernameRule } from "~/lib/validationSchemas";
 import request from "~/lib/request";
@@ -15,7 +14,6 @@ type RegisterFormInputs = {
   password: string;
   email: string;
   confirmPassword: string;
-  acceptTerms: boolean;
 };
 
 const schema: yup.SchemaOf<RegisterFormInputs> = yup
@@ -32,79 +30,95 @@ const schema: yup.SchemaOf<RegisterFormInputs> = yup
       .string()
       .oneOf([yup.ref("password")], "Password does not match.")
       .defined(),
-    acceptTerms: yup
-      .boolean()
-      .oneOf([true], validationMessages.required("Terms of Service"))
-      .defined(),
   })
   .defined();
 
 export default function RegisterForm() {
-  const methods = useForm<RegisterFormInputs>({
-    defaultValues: {
+  const formik = useFormik<RegisterFormInputs>({
+    initialValues: {
       username: "",
       password: "",
       email: "",
       confirmPassword: "",
-      acceptTerms: false,
     },
-    resolver: yupResolver(schema),
+    validationSchema: schema,
+    onSubmit: async (values, { setSubmitting }) => {
+      const registrationRequest = {
+        username: values.username,
+        password: values.password,
+        email: values.email,
+      };
+
+      try {
+        await request("auth/register", {
+          method: "post",
+          data: registrationRequest,
+        });
+
+        successfulToast({
+          title: "Thank you for registering.",
+          message: "You can now login to your account.",
+        });
+      } catch (err) {
+        apiErrorToast(err);
+      } finally {
+        setSubmitting(false);
+      }
+    },
   });
 
-  const {
-    handleSubmit,
-    formState: { isSubmitting },
-  } = methods;
-
-  const onSubmit = async (values: RegisterFormInputs) => {
-    const registrationRequest = {
-      username: values.username,
-      password: values.password,
-      email: values.email,
-    };
-
-    try {
-      await request("auth/register", {
-        method: "post",
-        data: registrationRequest,
-      });
-
-      successfulToast({
-        title: "Thank you for registering.",
-        message: "You can now login to your account.",
-      });
-    } catch (err) {
-      apiErrorToast(err);
-    }
-  };
+  const { values, errors, handleChange, handleSubmit, isSubmitting } = formik;
 
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <TextInput name="username" label="Username" required />
-        <TextInput name="email" label="Email" required />
-        <TextInput name="password" type="password" label="Password" required />
-        <TextInput
-          name="confirmPassword"
-          type="password"
-          label="Confirm Password"
-          required
-        />
-        <InputCheckbox name="acceptTerms" required>
-          I agree to the terms of service.
-        </InputCheckbox>
-        <Flex justify="flex-end">
-          <Button
-            marginTop={4}
-            width="100%"
-            type="submit"
-            isLoading={isSubmitting}
-            colorScheme="primary"
-          >
-            Register
-          </Button>
-        </Flex>
-      </form>
-    </FormProvider>
+    <form onSubmit={handleSubmit}>
+      <TextInput
+        name="username"
+        value={values.username}
+        onChange={handleChange}
+        error={errors.username}
+        label="Username"
+        required
+      />
+      <TextInput
+        name="email"
+        value={values.email}
+        onChange={handleChange}
+        error={errors.email}
+        label="Email"
+        required
+      />
+      <TextInput
+        name="password"
+        type="password"
+        value={values.password}
+        onChange={handleChange}
+        error={errors.password}
+        label="Password"
+        required
+      />
+      <TextInput
+        name="confirmPassword"
+        type="password"
+        value={values.confirmPassword}
+        onChange={handleChange}
+        error={errors.confirmPassword}
+        label="Confirm Password"
+        required
+      />
+      <Text fontSize="sm">
+        By registering, you agree to our terms and service.
+      </Text>
+      <Flex justify="flex-end">
+        <Button
+          marginTop={4}
+          width="100%"
+          type="submit"
+          isLoading={isSubmitting}
+          colorScheme="primary"
+        >
+          Register
+        </Button>
+      </Flex>
+    </form>
   );
 }

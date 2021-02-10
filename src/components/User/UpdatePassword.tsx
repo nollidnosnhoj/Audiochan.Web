@@ -1,13 +1,13 @@
 import React from "react";
 import { Button } from "@chakra-ui/react";
-import { useForm, FormProvider } from "react-hook-form";
 import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { useFormik } from "formik";
 import TextInput from "~/components/Form/TextInput";
 import request from "~/lib/request";
 import { passwordRule } from "~/lib/validationSchemas";
-import { apiErrorToast } from "~/utils/toast";
+import { apiErrorToast, successfulToast } from "~/utils/toast";
 import { validationMessages } from "~/utils";
+import useUser from "~/lib/contexts/user_context";
 
 type UpdatePasswordValues = {
   currentPassword: string;
@@ -15,81 +15,88 @@ type UpdatePasswordValues = {
   confirmPassword: string;
 };
 
-const defaultValues = {
-  currentPassword: "",
-  newPassword: "",
-  confirmPassword: "",
-};
-
 export default function UpdatePassword() {
-  const methods = useForm<UpdatePasswordValues>({
-    defaultValues: defaultValues,
-    resolver: yupResolver(
-      yup.object().shape({
-        currentPassword: yup
-          .string()
-          .required(validationMessages.required("Current Password")),
-        newPassword: passwordRule("New Password"),
-        confirmPassword: yup
-          .string()
-          .required()
-          .oneOf([yup.ref("newPassword")], "Password does not match."),
-      })
-    ),
+  const { logout } = useUser();
+  const formik = useFormik<UpdatePasswordValues>({
+    initialValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+    validationSchema: yup.object().shape({
+      currentPassword: yup
+        .string()
+        .required(validationMessages.required("Current Password")),
+      newPassword: passwordRule("New Password"),
+      confirmPassword: yup
+        .string()
+        .required()
+        .oneOf([yup.ref("newPassword")], "Password does not match."),
+    }),
+    onSubmit: async (values, { resetForm, setSubmitting }) => {
+      const { currentPassword, newPassword } = values;
+      try {
+        await request("me/password", {
+          method: "patch",
+          data: {
+            currentPassword: currentPassword,
+            newPassword: newPassword,
+          },
+        });
+        resetForm();
+        logout().then(() => {
+          successfulToast({
+            title: "Password changed",
+            message: "Please login again with your new password.",
+          });
+        });
+      } catch (err) {
+        apiErrorToast(err);
+      } finally {
+        setSubmitting(false);
+      }
+    },
   });
 
-  const {
-    handleSubmit,
-    reset,
-    formState: { isSubmitting },
-  } = methods;
-
-  const updatePassword = async (values: UpdatePasswordValues) => {
-    const { currentPassword, newPassword } = values;
-    try {
-      await request("me/change-password", {
-        method: "post",
-        data: {
-          currentPassword: currentPassword,
-          newPassword: newPassword,
-        },
-      });
-      reset(defaultValues);
-    } catch (err) {
-      apiErrorToast(err);
-    }
-  };
+  const { errors, values, handleSubmit, handleChange, isSubmitting } = formik;
 
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(updatePassword)}>
-        <TextInput
-          name="currentPassword"
-          type="password"
-          label="Current Password"
-          required
-        />
-        <TextInput
-          name="newPassword"
-          type="password"
-          label="New Password"
-          required
-        />
-        <TextInput
-          name="confirmPassword"
-          type="password"
-          label="Confirm Password"
-          required
-        />
-        <Button
-          type="submit"
-          isLoading={isSubmitting}
-          disabled={isSubmitting}
-          loadingText="Submitting..."
-        >
-          Update Password
-        </Button>
-      </form>
-    </FormProvider>
+    <form onSubmit={handleSubmit}>
+      <TextInput
+        name="currentPassword"
+        value={values.currentPassword}
+        onChange={handleChange}
+        error={errors.currentPassword}
+        type="password"
+        label="Current Password"
+        required
+      />
+      <TextInput
+        name="newPassword"
+        type="password"
+        value={values.newPassword}
+        onChange={handleChange}
+        error={errors.newPassword}
+        label="New Password"
+        required
+      />
+      <TextInput
+        name="confirmPassword"
+        type="password"
+        value={values.confirmPassword}
+        onChange={handleChange}
+        error={errors.confirmPassword}
+        label="Confirm Password"
+        required
+      />
+      <Button
+        type="submit"
+        isLoading={isSubmitting}
+        disabled={isSubmitting}
+        loadingText="Submitting..."
+      >
+        Update Password
+      </Button>
+    </form>
   );
 }

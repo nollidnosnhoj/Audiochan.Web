@@ -6,12 +6,13 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import React from "react";
-import { FieldError, useFormContext } from "react-hook-form";
-import { ErrorMessage } from "@hookform/error-message";
 
 interface InputFieldProps {
   name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent) => void;
   type?: string;
+  error?: string;
   label?: string;
   required?: boolean;
   placeholder?: string;
@@ -21,40 +22,43 @@ interface InputFieldProps {
 
 const TextInput: React.FC<InputFieldProps> = ({
   name,
-  type = "text",
+  value,
+  onChange,
   label,
   placeholder,
+  error,
+  type = "text",
   required = false,
   textArea = false,
   disabled = false,
 }) => {
-  const { register, errors } = useFormContext();
-
   return (
     <FormControl
       id={name}
-      isInvalid={!!errors[name]}
+      isInvalid={!!error}
       isRequired={required}
       paddingY={2}
     >
       {label && <FormLabel htmlFor={name}>{label}</FormLabel>}
       {textArea ? (
         <Textarea
-          ref={register}
           name={name}
+          value={value}
+          onChange={onChange}
           placeholder={placeholder}
           disabled={disabled}
         />
       ) : (
         <Input
           type={type}
-          ref={register}
           name={name}
+          value={value}
+          onChange={onChange}
           placeholder={placeholder}
           disabled={disabled}
         />
       )}
-      <ErrorMessage name={name} errors={errors} as={FormErrorMessage} />
+      <FormErrorMessage>{error}</FormErrorMessage>
     </FormControl>
   );
 };

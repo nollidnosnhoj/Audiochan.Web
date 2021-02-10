@@ -1,9 +1,11 @@
 import { Checkbox, FormControl, FormLabel, Switch } from "@chakra-ui/react";
 import React from "react";
-import { useFormContext } from "react-hook-form";
 
 interface InputCheckboxProps {
   name: string;
+  value: boolean;
+  onChange: () => void;
+  error?: string;
   label?: string;
   disabled?: boolean;
   required?: boolean;
@@ -12,18 +14,20 @@ interface InputCheckboxProps {
 
 const InputCheckbox: React.FC<InputCheckboxProps> = ({
   name,
+  value,
+  onChange,
+  error,
   label,
   children,
   disabled = false,
   required = false,
   toggleSwitch = false,
 }) => {
-  const { register, errors } = useFormContext();
   return (
     <FormControl
       display="flex"
       alignItems="center"
-      isInvalid={!!errors[name]}
+      isInvalid={!!error}
       isRequired={required}
       paddingY={2}
     >
@@ -33,9 +37,21 @@ const InputCheckbox: React.FC<InputCheckboxProps> = ({
         </FormLabel>
       )}
       {toggleSwitch ? (
-        <Switch id={name} name={name} disabled={disabled} ref={register} />
+        <Switch
+          id={name}
+          name={name}
+          disabled={disabled}
+          defaultChecked={value}
+          onChange={onChange}
+        />
       ) : (
-        <Checkbox id={name} name={name} ref={register} disabled={disabled}>
+        <Checkbox
+          id={name}
+          name={name}
+          disabled={disabled}
+          checked={value}
+          onChange={onChange}
+        >
           {children}
         </Checkbox>
       )}

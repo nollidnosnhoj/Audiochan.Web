@@ -124,14 +124,14 @@ export const useCreateAudio = () => {
 export const useEditAudio = (id: number) => {
   const queryClient = useQueryClient();
   const updateAudio = async (input: object) => {
-    const { data } = await request<Audio>(`audios/${id}`, { method: 'patch', data: input });
+    const { data } = await request<Audio>(`audios/${id}`, { method: 'put', data: input });
     return data;
   }
 
   return useMutation(updateAudio, {
     onSuccess: (data) => {
       queryClient.setQueryData<Audio>([`audios`, id], data);
-      queryClient.invalidateQueries(`audios`, { exact: true });
+      queryClient.invalidateQueries(`audios`);
     }
   })
 }

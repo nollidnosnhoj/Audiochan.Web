@@ -45,15 +45,15 @@ export const passwordRule = (label: string) => {
   if (passwordMinLength) 
     schema = schema.min(passwordMinLength, validationMessages.min(label, passwordMinLength));
   if (passwordRequireDigit) 
-    schema = schema.matches(/^[0-9]+$/, "Password must contain one digit.");
+    schema = schema.matches(/[\d]+/, "Password must contain one digit.");
   if (passwordRequireLowercase) 
-    schema = schema.matches(/^[a-z]+$/, "Password must contain one lowercase character.");
+    schema = schema.matches(/[a-z]+/, "Password must contain one lowercase character.");
   if (passwordRequireUppercase) 
-    schema = schema.matches(/^[A-Z]+$/, "Password must contain one uppercase character.");
+    schema = schema.matches(/[A-Z]+/, "Password must contain one uppercase character.");
   if (passwordRequireNonAlphanumeric) 
-    schema = schema.matches(/^[^a-zA-Z\d]+$/, "Password must contain one non-alphanumeric character.");
+    schema = schema.matches(/[^a-zA-Z\d]+/, "Password must contain one non-alphanumeric character.");
 
-  return schema.defined();
+  return schema.ensure().defined();
 }
 
 export const editAudioSchema: SchemaOf<AudioRequest> = object().shape({
@@ -63,13 +63,14 @@ export const editAudioSchema: SchemaOf<AudioRequest> = object().shape({
     .defined(),
   description: string()
     .max(500, validationMessages.max("Description", 500))
+    .ensure()
     .defined(),
   tags: array(string())
     .max(10, validationMessages.max("Tags", 10))
     .ensure()
     .defined(),
   genre: string()
-    .required(validationMessages.required("Genre"))
+    .ensure()
     .defined(),
   isPublic: boolean()
     .defined()
@@ -81,12 +82,14 @@ export const uploadAudioSchema: SchemaOf<AudioRequest> = object().shape({
     .defined(),
   description: string()
     .max(500, validationMessages.max("Description", 500))
+    .ensure()
     .defined(),
   tags: array(string())
     .max(10, validationMessages.max("Tags", 10))
     .ensure()
     .defined(),
   genre: string()
+    .ensure()
     .defined(),
   isPublic: boolean()
     .defined()

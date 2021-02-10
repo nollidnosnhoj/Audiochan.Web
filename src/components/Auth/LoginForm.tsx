@@ -1,8 +1,7 @@
 import React from "react";
 import { Button, Stack } from "@chakra-ui/react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useFormik } from "formik";
 import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
 import TextInput from "../Form/TextInput";
 import useUser from "~/lib/contexts/user_context";
 import { apiErrorToast, successfulToast } from "~/utils/toast";
@@ -19,45 +18,58 @@ interface LoginFormProps {
 export default function LoginForm(props: LoginFormProps) {
   const { login } = useUser();
 
-  const methods = useForm<LoginFormValues>({
-    resolver: yupResolver(
-      yup.object().shape({
-        username: yup.string().required(),
-        password: yup.string().required(),
-      })
-    ),
+  const formik = useFormik<LoginFormValues>({
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        await login(values);
+        successfulToast({ message: "You have logged in successfully. " });
+        if (props.onSuccess) props.onSuccess();
+      } catch (err) {
+        apiErrorToast(err);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    initialValues: {
+      username: "",
+      password: "",
+    },
+    validationSchema: yup.object().shape({
+      username: yup.string().required(),
+      password: yup.string().required(),
+    }),
   });
 
-  const {
-    handleSubmit,
-    formState: { isSubmitting },
-  } = methods;
-
-  const onSubmit = async (values: LoginFormValues) => {
-    try {
-      await login(values);
-      successfulToast({ message: "You have logged in successfully. " });
-      if (props.onSuccess) props.onSuccess();
-    } catch (err) {
-      apiErrorToast(err);
-    }
-  };
+  const { handleSubmit, handleChange, values, errors, isSubmitting } = formik;
 
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <TextInput name="username" label="Username/Email" required />
-        <TextInput name="password" type="password" label="Password" required />
-        <Button
-          marginTop={4}
-          width="100%"
-          type="submit"
-          isLoading={isSubmitting}
-          colorScheme="primary"
-        >
-          Login
-        </Button>
-      </form>
-    </FormProvider>
+    <form onSubmit={handleSubmit}>
+      <TextInput
+        name="username"
+        value={values.username}
+        onChange={handleChange}
+        error={errors.username}
+        label="Username/Email"
+        required
+      />
+      <TextInput
+        name="password"
+        type="password"
+        value={values.password}
+        onChange={handleChange}
+        error={errors.username}
+        label="Password"
+        required
+      />
+      <Button
+        marginTop={4}
+        width="100%"
+        type="submit"
+        isLoading={isSubmitting}
+        colorScheme="primary"
+      >
+        Login
+      </Button>
+    </form>
   );
 }

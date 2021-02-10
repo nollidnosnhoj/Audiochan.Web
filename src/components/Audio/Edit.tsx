@@ -23,8 +23,7 @@ import {
 import { DeleteIcon } from "@chakra-ui/icons";
 import React, { useEffect, useMemo, useState } from "react";
 import Router from "next/router";
-import { Controller, FormProvider, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { useFormik } from "formik";
 import InputCheckbox from "../Form/Checkbox";
 import GenreSelect from "../Form/GenreSelect";
 import TextInput from "../Form/TextInput";
@@ -46,7 +45,7 @@ function mapAudioToModifyInputs(audio: Audio): AudioRequest {
     description: audio.description,
     tags: audio.tags.split(" ").filter((tag) => tag.length > 0),
     isPublic: audio.isPublic,
-    genre: audio.genre?.slug ?? "",
+    genre: audio.genre?.slug,
   };
 }
 
@@ -61,24 +60,43 @@ const AudioEditModal: React.FC<AudioEditProps> = ({
   const { mutateAsync: deleteAudio } = useRemoveAudio(audioId);
   const [deleting, setDeleting] = useState(false);
 
-  const methods = useForm<AudioRequest>({
-    defaultValues: currentValues,
-    resolver: yupResolver(editAudioSchema),
+  const formik = useFormik<AudioRequest>({
+    initialValues: currentValues,
+    validationSchema: editAudioSchema,
+    onSubmit: (inputs, { setSubmitting }) => {
+      const newRequest = {};
+      if (currentValues) {
+        Object.entries(inputs).forEach(([key, value]) => {
+          if (currentValues[key] !== value) {
+            newRequest[key] = value;
+          }
+        });
+      } else {
+        Object.assign(newRequest, inputs ?? {});
+      }
+
+      updateAudio(newRequest)
+        .then(() => {
+          successfulToast({ title: "Audio updated" });
+          onClose();
+        })
+        .catch((err) => {
+          apiErrorToast(err);
+        })
+        .finally(() => setSubmitting(false));
+    },
   });
 
   const {
-    reset,
-    handleSubmit,
-    control,
+    isSubmitting,
+    values,
     errors,
-    formState: { isSubmitting },
-  } = methods;
+    handleChange,
+    handleSubmit,
+    setFieldValue,
+  } = formik;
 
-  useEffect(() => {
-    reset(currentValues);
-  }, [reset, currentValues]);
-
-  const onDeleteSubmit = async () => {
+  const onDeleteSubmit = () => {
     setDeleting(true);
     deleteAudio()
       .then(() => {
@@ -94,28 +112,6 @@ const AudioEditModal: React.FC<AudioEditProps> = ({
       });
   };
 
-  const onEditSubmit = async (inputs: AudioRequest) => {
-    const newRequest = {};
-    if (currentValues) {
-      Object.entries(inputs).forEach(([key, value]) => {
-        if (currentValues[key] !== value) {
-          newRequest[key] = value;
-        }
-      });
-    } else {
-      Object.assign(newRequest, inputs ?? {});
-    }
-
-    updateAudio(newRequest)
-      .then(() => {
-        successfulToast({ title: "Audio updated" });
-        onClose();
-      })
-      .catch((err) => {
-        apiErrorToast(err);
-      });
-  };
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
@@ -123,96 +119,108 @@ const AudioEditModal: React.FC<AudioEditProps> = ({
         <ModalHeader>Edit '{audio.title}'</ModalHeader>
         {!isSubmitting && <ModalCloseButton />}
         <ModalBody>
-          <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onEditSubmit)}>
-              <TextInput
-                name="title"
-                type="text"
-                label="Title"
-                disabled={isSubmitting || deleting}
-                required
-              />
-              <TextInput
-                name="description"
-                label="Description"
-                disabled={isSubmitting || deleting}
-                textArea
-              />
-              <GenreSelect
-                name="genre"
-                placeholder="Select Genre"
-                disabled={isSubmitting}
-              />
-              <Controller
-                name="tags"
-                control={control}
-                render={({ name, value, onChange }) => (
-                  <TagInput
-                    name={name}
-                    value={value}
-                    onChange={onChange}
-                    error={errors.tags && errors.tags[0]}
-                    disabled={isSubmitting || deleting}
-                  />
-                )}
-              />
-              <InputCheckbox
-                name="isPublic"
-                label="Public?"
-                disabled={isSubmitting || deleting}
-                required
-                toggleSwitch
-              />
-              <Flex marginY={4}>
-                <Box>
-                  <Popover>
-                    <PopoverTrigger>
-                      <IconButton
-                        colorScheme="red"
-                        variant="outline"
-                        aria-label="Remove upload"
-                        icon={<DeleteIcon />}
-                        isLoading={isSubmitting || deleting}
-                      >
-                        Delete
-                      </IconButton>
-                    </PopoverTrigger>
-                    <PopoverContent>
-                      <PopoverArrow />
-                      <PopoverCloseButton />
-                      <PopoverHeader>Remove Confirmation</PopoverHeader>
-                      <PopoverBody>
-                        Are you sure you want to remove this upload? You cannot
-                        undo this action.
-                      </PopoverBody>
-                      <PopoverFooter d="flex" justifyContent="flex-end">
-                        <ButtonGroup size="sm">
-                          <Button
-                            colorScheme="red"
-                            onClick={onDeleteSubmit}
-                            disabled={isSubmitting || deleting}
-                          >
-                            Remove
-                          </Button>
-                        </ButtonGroup>
-                      </PopoverFooter>
-                    </PopoverContent>
-                  </Popover>
-                </Box>
-                <Spacer />
-                <Box>
-                  <Button
-                    colorScheme="blue"
-                    type="submit"
-                    isLoading={isSubmitting || deleting}
-                    loadingText="Processing..."
-                  >
-                    Modify
-                  </Button>
-                </Box>
-              </Flex>
-            </form>
-          </FormProvider>
+          <form onSubmit={handleSubmit}>
+            <TextInput
+              name="title"
+              type="text"
+              label="Title"
+              value={values.title}
+              onChange={handleChange}
+              error={errors.title}
+              disabled={isSubmitting || deleting}
+              required
+            />
+            <TextInput
+              name="description"
+              label="Description"
+              value={values.description ?? ""}
+              onChange={handleChange}
+              error={errors.description}
+              disabled={isSubmitting || deleting}
+              textArea
+            />
+            <GenreSelect
+              name="genre"
+              value={values.genre ?? ""}
+              onChange={handleChange}
+              error={errors.genre}
+              placeholder="Select Genre"
+              disabled={isSubmitting}
+            />
+            <TagInput
+              name="tags"
+              value={values.tags}
+              onAdd={(tag) => {
+                setFieldValue("tags", [...values.tags, tag]);
+              }}
+              onRemove={(index) => {
+                setFieldValue(
+                  "tags",
+                  values.tags.filter((_, i) => i !== index)
+                );
+              }}
+              error={errors.tags}
+              disabled={isSubmitting || deleting}
+            />
+            <InputCheckbox
+              name="isPublic"
+              label="Public?"
+              value={values.isPublic}
+              onChange={() => setFieldValue("isPublic", !values.isPublic)}
+              error={errors.isPublic}
+              disabled={isSubmitting || deleting}
+              required
+              toggleSwitch
+            />
+            <Flex marginY={4}>
+              <Box>
+                <Popover>
+                  <PopoverTrigger>
+                    <IconButton
+                      colorScheme="red"
+                      variant="outline"
+                      aria-label="Remove upload"
+                      icon={<DeleteIcon />}
+                      isLoading={isSubmitting || deleting}
+                    >
+                      Delete
+                    </IconButton>
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <PopoverArrow />
+                    <PopoverCloseButton />
+                    <PopoverHeader>Remove Confirmation</PopoverHeader>
+                    <PopoverBody>
+                      Are you sure you want to remove this upload? You cannot
+                      undo this action.
+                    </PopoverBody>
+                    <PopoverFooter d="flex" justifyContent="flex-end">
+                      <ButtonGroup size="sm">
+                        <Button
+                          colorScheme="red"
+                          onClick={onDeleteSubmit}
+                          disabled={isSubmitting || deleting}
+                        >
+                          Remove
+                        </Button>
+                      </ButtonGroup>
+                    </PopoverFooter>
+                  </PopoverContent>
+                </Popover>
+              </Box>
+              <Spacer />
+              <Box>
+                <Button
+                  colorScheme="blue"
+                  type="submit"
+                  isLoading={isSubmitting || deleting}
+                  loadingText="Processing..."
+                >
+                  Modify
+                </Button>
+              </Box>
+            </Flex>
+          </form>
         </ModalBody>
       </ModalContent>
     </Modal>

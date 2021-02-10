@@ -1,8 +1,7 @@
 import React from "react";
 import { Button } from "@chakra-ui/react";
 import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm, FormProvider } from "react-hook-form";
+import { useFormik } from "formik";
 import TextInput from "~/components/Form/TextInput";
 import useUser from "~/lib/contexts/user_context";
 import request from "~/lib/request";
@@ -12,51 +11,54 @@ import { apiErrorToast } from "~/utils/toast";
 export default function UpdateUsername() {
   const { user, updateUser } = useUser();
 
-  const updateUsername = async (values: { username: string }) => {
-    const { username } = values;
-    if (username.toLowerCase() === user?.username) return;
+  const formik = useFormik<{ username: string }>({
+    initialValues: { username: user?.username ?? "" },
+    validationSchema: yup.object().shape({
+      username: usernameRule("Username").notOneOf(
+        [user?.username],
+        "Username cannot be the same."
+      ),
+    }),
+    onSubmit: async (values, { setSubmitting }) => {
+      const { username } = values;
+      if (username.toLowerCase() === user?.username) return;
 
-    try {
-      await request("me/change-username", { method: "patch", data: username });
-      if (user) {
-        updateUser({ ...user, username: username });
+      try {
+        await request("me/change-username", {
+          method: "patch",
+          data: username,
+        });
+        if (user) {
+          updateUser({ ...user, username: username });
+        }
+      } catch (err) {
+        apiErrorToast(err);
+      } finally {
+        setSubmitting(false);
       }
-    } catch (err) {
-      apiErrorToast(err);
-    }
-  };
-
-  const methods = useForm<{ username: string }>({
-    defaultValues: { username: user?.username ?? "" },
-    mode: "onChange",
-    resolver: yupResolver(
-      yup.object().shape({
-        username: usernameRule("Username").notOneOf(
-          [user?.username],
-          "Username cannot be the same."
-        ),
-      })
-    ),
+    },
   });
 
-  const {
-    handleSubmit,
-    formState: { isSubmitting },
-  } = methods;
+  const { errors, values, handleSubmit, handleChange, isSubmitting } = formik;
 
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(updateUsername)}>
-        <TextInput name="username" label="Change Username" required />
-        <Button
-          type="submit"
-          isLoading={isSubmitting}
-          disabled={isSubmitting}
-          loadingText="Submitting..."
-        >
-          Update Username
-        </Button>
-      </form>
-    </FormProvider>
+    <form onSubmit={handleSubmit}>
+      <TextInput
+        name="username"
+        value={values.username}
+        onChange={handleChange}
+        error={errors.username}
+        label="Change Username"
+        required
+      />
+      <Button
+        type="submit"
+        isLoading={isSubmitting}
+        disabled={isSubmitting}
+        loadingText="Submitting..."
+      >
+        Update Username
+      </Button>
+    </form>
   );
 }

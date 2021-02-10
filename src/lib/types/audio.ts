@@ -26,8 +26,8 @@ export type Audio = {
 
 export interface AudioRequest {
   title: string;
-  description: string;
+  description?: string;
   tags: string[];
   isPublic: boolean;
-  genre: string;
+  genre?: string;
 };

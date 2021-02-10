@@ -9,7 +9,7 @@ export type AuthResult = {
 }
 
 export type ErrorResponse = {
-  title: string;
+  code: number;
   message: string;
   errors?: { [key: string]: string[] }
 }
