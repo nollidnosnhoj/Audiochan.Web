@@ -2,23 +2,31 @@ import axios from "axios";
 import {
   Box,
   Button,
+  Flex,
   Heading,
   Progress,
+  Spinner,
   Stack,
   VStack,
 } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useState } from "react";
+import Router from "next/router";
 import NextLink from "next/link";
 import request from "~/lib/request";
-import { useCreateAudio } from "~/lib/services/audio";
+import {
+  addAudioPicture,
+  useAddAudioPicture,
+  useCreateAudio,
+} from "~/lib/services/audio";
 import { objectToFormData } from "~/utils";
-import { apiErrorToast } from "~/utils/toast";
+import { apiErrorToast, errorToast, successfulToast } from "~/utils/toast";
 import useUser from "~/lib/contexts/user_context";
-import { EditAudioRequest } from "~/lib/types/audio";
+import { AudioRequest } from "~/lib/types/audio";
 
 interface AudioUploadingProps {
   file: File;
-  form?: EditAudioRequest;
+  form?: AudioRequest;
+  picture?: string;
 }
 
 type S3PresignedUrl = {
@@ -27,106 +35,121 @@ type S3PresignedUrl = {
 };
 
 const STAGE_MESSAGES = [
-  "Getting Upload URL...",
-  "Uploading Audio...",
-  "Creating Audio Record...",
-  "Finished Uploading!",
+  "Getting Upload URL",
+  "Uploading Audio",
+  "Creating Audio Record",
+  "Uploading Picture",
 ];
 
 export default function AudioUploading(props: AudioUploadingProps) {
-  const { file, form } = props;
+  const { file, form, picture } = props;
   const { user } = useUser();
-  const [uploadData, setUploadData] = useState<S3PresignedUrl | undefined>(
-    undefined
-  );
   const [stage, setStage] = useState(0);
   const [progress, setProgress] = useState(0);
   const [audioId, setAudioId] = useState(0);
-  const { mutateAsync: uploadAudio } = useCreateAudio();
-
-  if (!file || !user) {
-    return null;
-  }
+  const [completed, setCompleted] = useState(false);
+  const { mutateAsync: createAudio } = useCreateAudio();
 
   useEffect(() => {
-    if (file) {
-      setAudioId(0);
+    if (file && user) {
       request<S3PresignedUrl>("upload", {
         method: "post",
         data: { fileName: file.name },
       })
         .then(({ data }) => {
-          setUploadData(data);
+          setStage(1);
+          const { url, uploadId } = data;
+          axios
+            .put(url, file, {
+              headers: {
+                "Content-Type": file.type,
+                "x-amz-meta-userId": `${user.id}`,
+              },
+              onUploadProgress: (evt) => {
+                const currentProgress = (evt.loaded / evt.total) * 100;
+                setProgress(currentProgress);
+              },
+            })
+            .then(() => {
+              setStage(2);
+              var audio = new Audio();
+              audio.src = window.URL.createObjectURL(file);
+              audio.onloadedmetadata = () => {
+                const body = {
+                  uploadId: uploadId,
+                  fileName: file.name,
+                  duration: Math.round(audio.duration),
+                  ...form,
+                };
+
+                createAudio(objectToFormData(body))
+                  .then(({ id }) => {
+                    setAudioId(id);
+                    if (picture) {
+                      setStage(3);
+                    } else {
+                      setCompleted(true);
+                    }
+                  })
+                  .catch((err) => {
+                    apiErrorToast(err);
+                  });
+              };
+            })
+            .catch(() => {
+              errorToast({
+                message: "Unable to upload audio.",
+              });
+            });
         })
-        .catch((err) => {
-          apiErrorToast(err);
+        .catch(() => {
+          errorToast({ message: "Unable to receive upload Url." });
         });
     }
   }, [file]);
 
   useEffect(() => {
-    if (uploadData) {
-      const { url, uploadId } = uploadData;
-      setStage(1);
-      axios
-        .put(url, file, {
-          headers: {
-            "Content-Type": file.type,
-            "x-amz-meta-userId": `${user.id}`,
-          },
-          onUploadProgress: (evt) => {
-            const currentProgress = (evt.loaded / evt.total) * 100;
-            setProgress(currentProgress);
-          },
-        })
+    if (audioId > 0 && picture) {
+      addAudioPicture(audioId, picture)
         .then(() => {
-          setStage(2);
-          var audio = new Audio();
-          audio.src = window.URL.createObjectURL(file);
-          audio.onloadedmetadata = () => {
-            const body = {
-              uploadId: uploadId,
-              fileName: file.name,
-              duration: Math.round(audio.duration),
-              ...form,
-            };
-
-            console.log(body);
-
-            var formData = objectToFormData(body);
-
-            uploadAudio(formData)
-              .then(({ id }) => {
-                setStage(3);
-                setAudioId(id);
-              })
-              .catch((err) => {
-                apiErrorToast(err);
-              });
-          };
+          setCompleted(true);
         })
-        .catch((err) => {
-          apiErrorToast(err);
-        });
+        .catch((err) => apiErrorToast(err));
     }
-  }, [uploadData]);
+  }, [audioId, picture]);
+
+  useEffect(() => {
+    if (completed && audioId > 0) {
+      Router.push(`audios/${audioId}`).then(() => {
+        successfulToast({
+          title: "Audio uploaded",
+          message: "You have successfully uploaded your audio.",
+        });
+      });
+    }
+  }, [completed, audioId]);
+
+  if (!file || !user) {
+    return null;
+  }
 
   return (
-    <Stack direction="column" spacing={4}>
-      <Heading>{STAGE_MESSAGES[stage]}</Heading>
-      <Progress
-        hasStripe
-        value={progress}
-        isAnimated={stage !== 3}
-        isIndeterminate={stage !== 1}
-      />
-      {audioId > 0 && (
-        <Box>
-          <NextLink href={`audios/${audioId}`} passHref>
-            <Button>Go to audio</Button>
-          </NextLink>
+    <Flex justify="center" align="center" height="50vh">
+      <Stack direction="column" spacing={8}>
+        <Heading>
+          {!completed ? STAGE_MESSAGES[stage] : `Audio Uploaded!`}
+        </Heading>
+        <Box justifyContent="center" alignItems="center">
+          {!completed && (
+            <Progress
+              hasStripe
+              value={progress}
+              isAnimated
+              isIndeterminate={stage !== 1}
+            />
+          )}
         </Box>
-      )}
-    </Stack>
+      </Stack>
+    </Flex>
   );
 }

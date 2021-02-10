@@ -54,7 +54,6 @@ export default function ProfilePage() {
   const { query } = useRouter();
   const username = query.username as string;
   const { data: profile } = useProfile(username, { staleTime: 1000 });
-  const [picture, setPicture] = useState("");
   const {
     mutateAsync: addPictureAsync,
     isLoading: isAdddingPicture,
@@ -69,6 +68,12 @@ export default function ProfilePage() {
     );
   }
 
+  const [picture, setPicture] = useState(() => {
+    return profile?.picture
+      ? `https://audiochan.s3.amazonaws.com/${profile.picture}`
+      : "";
+  });
+
   return (
     <Page title={`${profile?.username || "Unknown user"} | Audiochan`}>
       <Flex direction="row">
@@ -81,12 +86,19 @@ export default function ProfilePage() {
                 image={picture}
                 disabled={isAdddingPicture}
                 onChange={async (file) => {
-                  await addPictureAsync(file);
-                  setPicture(window.URL.createObjectURL(file));
-                  successfulToast({
-                    title: "Image successfully uploaded.",
-                    message: "Image may take a couple minutes to update.",
-                  });
+                  const reader = new FileReader();
+                  reader.readAsDataURL(file);
+                  reader.onload = () => {
+                    addPictureAsync(reader.result as string).then(
+                      ({ data }) => {
+                        setPicture(data.image);
+                        successfulToast({
+                          title: "Image successfully uploaded.",
+                          message: "Image may take a couple minutes to update.",
+                        });
+                      }
+                    );
+                  };
                 }}
               />
             )}

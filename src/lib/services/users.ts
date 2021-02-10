@@ -54,12 +54,10 @@ export const useProfile = (username: string, options: UseQueryOptions<Profile, E
 
 export const useAddUserPicture = (username: string) => {
   const queryClient = useQueryClient();
-  const uploadArtwork = async (file: File) => {
-    const formData = new FormData();
-    formData.append('image', file);
+  const uploadArtwork = async (data: string) => {
     return await request<{ image: string }>(`me/picture`, {
       method: 'patch',
-      data: formData
+      data: { data }
     });
   }
 

@@ -77,7 +77,7 @@ const Header: React.FC<HeaderProps> = (props) => {
   );
 
   const UserMenu = user ? (
-    <Box>
+    <Box zIndex={4}>
       <Menu placement="bottom-end">
         <MenuButton
           as={IconButton}

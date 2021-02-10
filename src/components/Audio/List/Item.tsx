@@ -10,7 +10,7 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useMemo } from "react";
 import NextLink from "next/link";
 import { MdLoop } from "react-icons/md";
 import Picture from "~/components/Shared/Picture";
@@ -26,6 +26,12 @@ const AudioListItem: React.FC<AudioListItemProps> = ({
   audio,
   removeArtistName = false,
 }) => {
+  const picture = useMemo(() => {
+    return audio?.picture
+      ? `https://audiochan.s3.amazonaws.com/${audio.picture}`
+      : "";
+  }, [audio]);
+
   return (
     <LinkBox
       as="article"
@@ -37,12 +43,12 @@ const AudioListItem: React.FC<AudioListItemProps> = ({
       overflow="hidden"
     >
       <Box>
-        <Picture src={audio?.pictureUrl ?? ""} size={125} />
+        <Picture src={picture} size={125} />
       </Box>
       <Flex width="100%" paddingY={2} paddingX={4}>
         <Box flex="3">
           <Heading as="h3" size="md">
-            <NextLink href={`audios/${audio.id}`} passHref>
+            <NextLink href={`/audios/${audio.id}`} passHref>
               <LinkOverlay href={``}>{audio.title}</LinkOverlay>
             </NextLink>
           </Heading>

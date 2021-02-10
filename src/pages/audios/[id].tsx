@@ -85,7 +85,11 @@ export default function AudioDetailsPage(
     );
   }
 
-  const [picture, setPicture] = useState(audio?.pictureUrl ?? "");
+  const [picture, setPicture] = useState(() => {
+    return audio?.picture
+      ? `https://audiochan.s3.amazonaws.com/${audio.picture}`
+      : "";
+  });
 
   const {
     mutateAsync: uploadArtwork,
@@ -116,12 +120,20 @@ export default function AudioDetailsPage(
                   image={picture}
                   disabled={isAddingArtwork}
                   onChange={async (file) => {
-                    await uploadArtwork(file);
-                    setPicture(window.URL.createObjectURL(file));
-                    successfulToast({
-                      title: "Image successfully uploaded.",
-                      message: "Image may take a couple minutes to update.",
-                    });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                      uploadArtwork(reader.result as string).then(
+                        ({ data }) => {
+                          setPicture(data.image);
+                          successfulToast({
+                            title: "Image successfully uploaded.",
+                            message:
+                              "Image may take a couple minutes to update.",
+                          });
+                        }
+                      );
+                    };
                   }}
                 />
               )}

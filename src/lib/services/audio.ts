@@ -150,15 +150,17 @@ export const useRemoveAudio = (id: number) => {
   })
 }
 
+export const addAudioPicture = async (id: number, data: string) => {
+  return await request<{ image: string }>(`audios/${id}/picture`, {
+    method: 'patch',
+    data: { data }
+  });
+}
+
 export const useAddAudioPicture = (id: number) => {
   const queryClient = useQueryClient();
-  const uploadArtwork = async (file: File) => {
-    const formData = new FormData();
-    formData.append('image', file);
-    return await request<{ image: string }>(`audios/${id}/picture`, {
-      method: 'patch',
-      data: formData
-    });
+  const uploadArtwork = async (data: string) => {
+    return await addAudioPicture(id, data);
   }
 
   return useMutation(uploadArtwork, {

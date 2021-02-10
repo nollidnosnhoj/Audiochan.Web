@@ -8,7 +8,7 @@ import {
 } from 'yup'
 import SETTINGS from '~/constants/settings'
 import { validationMessages } from '~/utils'
-import { EditAudioRequest, UploadAudioRequest } from './types/audio';
+import { AudioRequest } from './types/audio';
 
 const { 
   usernameMinLength,
@@ -56,7 +56,7 @@ export const passwordRule = (label: string) => {
   return schema.defined();
 }
 
-export const editAudioSchema: SchemaOf<EditAudioRequest> = object().shape({
+export const editAudioSchema: SchemaOf<AudioRequest> = object().shape({
   title: string()
     .required(validationMessages.required("Title"))
     .max(30, validationMessages.max("Title", 30))
@@ -75,7 +75,7 @@ export const editAudioSchema: SchemaOf<EditAudioRequest> = object().shape({
     .defined()
 }).defined();
 
-export const uploadAudioSchema: SchemaOf<UploadAudioRequest> = object().shape({
+export const uploadAudioSchema: SchemaOf<AudioRequest> = object().shape({
   title: string()
     .max(30, validationMessages.max("Title", 30))
     .defined(),

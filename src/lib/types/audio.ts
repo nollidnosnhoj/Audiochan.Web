@@ -14,7 +14,7 @@ export type Audio = {
   fileSize: number;
   fileExt: string;
   url: string;
-  pictureUrl: string;
+  picture: string;
   favoriteCount: number;
   isFavorited: boolean;
   created: string;
@@ -24,14 +24,10 @@ export type Audio = {
   uploadId: string;
 }
 
-export interface EditAudioRequest {
+export interface AudioRequest {
   title: string;
   description: string;
   tags: string[];
   isPublic: boolean;
   genre: string;
 };
-
-export interface UploadAudioRequest extends EditAudioRequest {
-  acceptTerms: boolean
-}

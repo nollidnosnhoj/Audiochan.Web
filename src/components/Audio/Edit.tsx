@@ -29,7 +29,7 @@ import InputCheckbox from "../Form/Checkbox";
 import GenreSelect from "../Form/GenreSelect";
 import TextInput from "../Form/TextInput";
 import TagInput from "../Form/TagInput";
-import { Audio, EditAudioRequest } from "~/lib/types/audio";
+import { Audio, AudioRequest } from "~/lib/types/audio";
 import { useEditAudio, useRemoveAudio } from "~/lib/services/audio";
 import { editAudioSchema } from "~/lib/validationSchemas";
 import { apiErrorToast, successfulToast } from "~/utils/toast";
@@ -40,7 +40,7 @@ interface AudioEditProps {
   onClose: () => void;
 }
 
-function mapAudioToModifyInputs(audio: Audio): EditAudioRequest {
+function mapAudioToModifyInputs(audio: Audio): AudioRequest {
   return {
     title: audio.title,
     description: audio.description,
@@ -61,7 +61,7 @@ const AudioEditModal: React.FC<AudioEditProps> = ({
   const { mutateAsync: deleteAudio } = useRemoveAudio(audioId);
   const [deleting, setDeleting] = useState(false);
 
-  const methods = useForm<EditAudioRequest>({
+  const methods = useForm<AudioRequest>({
     defaultValues: currentValues,
     resolver: yupResolver(editAudioSchema),
   });
@@ -94,7 +94,7 @@ const AudioEditModal: React.FC<AudioEditProps> = ({
       });
   };
 
-  const onEditSubmit = async (inputs: EditAudioRequest) => {
+  const onEditSubmit = async (inputs: AudioRequest) => {
     const newRequest = {};
     if (currentValues) {
       Object.entries(inputs).forEach(([key, value]) => {
