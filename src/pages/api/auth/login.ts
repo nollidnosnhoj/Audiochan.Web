@@ -13,15 +13,12 @@ export type BackendAuthResult = {
 export default async (req: NextApiRequest, res: NextApiResponse<AuthResult>) => {
   try {
     if (req.method?.toUpperCase() !== 'POST') {
-      res.status(404);
-      return;
+      res.status(404).end();
     }
-
-    const loginRequest = req.body;
 
     const { status, data } = await request<BackendAuthResult>('auth/login', {
       method: 'post',
-      data: loginRequest,
+      data: req.body,
       skipAuthRefresh: true
     });
 
@@ -30,7 +27,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<AuthResult>) => 
     res.status(status).json({ accessToken: data.accessToken })
   } catch (err) {
     if (!isAxiosError(err)) {
-      res.status(500);
+      res.status(500).end();
     } else {
       const status = err.response?.status ?? 500;
       res.status(status).json(err?.response?.data);

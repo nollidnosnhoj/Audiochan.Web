@@ -9,7 +9,7 @@ export type Audio = {
   description: string;
   isPublic: boolean;
   isLoop: boolean;
-  tags: string;
+  tags: string[];
   duration: number;
   fileSize: number;
   fileExt: string;

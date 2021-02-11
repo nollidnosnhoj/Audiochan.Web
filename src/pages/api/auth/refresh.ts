@@ -24,7 +24,7 @@ export default async (req: NextApiRequest, res: NextApiResponse ) => {
     res.status(status).json({ accessToken: data.accessToken });
   } catch (err) {
     if (!isAxiosError(err)) {
-      res.status(500);
+      res.status(500).end();
     } else {
       const status = err?.response?.status || 500;
       res.status(status).json(err?.response?.data);

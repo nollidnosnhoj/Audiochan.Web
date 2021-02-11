@@ -10,7 +10,6 @@ import TextInput from "~/components/Form/TextInput";
 import { AudioRequest } from "~/lib/types/audio";
 import { uploadAudioSchema } from "~/lib/validationSchemas";
 import Picture from "~/components/Shared/Picture";
-import PictureDropzone from "~/components/Shared/Picture/PictureDropzone";
 
 interface AudioUploadProps {
   maxFileSize?: number;

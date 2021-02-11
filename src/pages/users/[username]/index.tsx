@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Button,
   Flex,
@@ -54,19 +53,11 @@ export default function ProfilePage() {
   const { query } = useRouter();
   const username = query.username as string;
   const { data: profile } = useProfile(username, { staleTime: 1000 });
+  if (!profile) return null;
   const {
     mutateAsync: addPictureAsync,
     isLoading: isAdddingPicture,
   } = useAddUserPicture(username);
-  const { isFollowing, follow } = useFollow(username);
-
-  if (!profile) {
-    return (
-      <Page title="User was not found.">
-        <Text>User was not found.</Text>
-      </Page>
-    );
-  }
 
   const [picture, setPicture] = useState(() => {
     return profile?.picture
@@ -74,34 +65,24 @@ export default function ProfilePage() {
       : "";
   });
 
+  const { isFollowing, follow } = useFollow(username, profile.isFollowing);
+
   return (
-    <Page title={`${profile?.username || "Unknown user"} | Audiochan`}>
+    <Page title={`${profile.username} | Audiochan`}>
       <Flex direction="row">
         <Flex flex="1" direction="column" justify="center">
           <Box textAlign="center">
-            <Picture src={picture} size={250} />
-            {user?.id === profile?.id && (
-              <PictureDropzone
-                name="image"
-                image={picture}
-                disabled={isAdddingPicture}
-                onChange={async (file) => {
-                  const reader = new FileReader();
-                  reader.readAsDataURL(file);
-                  reader.onload = () => {
-                    addPictureAsync(reader.result as string).then(
-                      ({ data }) => {
-                        setPicture(data.image);
-                        successfulToast({
-                          title: "Image successfully uploaded.",
-                          message: "Image may take a couple minutes to update.",
-                        });
-                      }
-                    );
-                  };
-                }}
-              />
-            )}
+            <Picture
+              src={picture}
+              size={250}
+              disabled={isAdddingPicture}
+              canReplace={user?.id === profile.id}
+              onReplace={(data) => {
+                addPictureAsync(data).then(({ data: { image } }) => {
+                  setPicture(image);
+                });
+              }}
+            />
           </Box>
           <Box textAlign="center" marginY={4}>
             <Text fontSize="2xl" as="strong">

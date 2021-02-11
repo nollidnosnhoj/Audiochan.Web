@@ -13,23 +13,24 @@ import { useAudioPlayer } from "~/lib/contexts/audio_player_context";
 import { formatDuration } from "~/utils/time";
 
 interface AudioPlayerProps {
-  uploadId: string;
+  fileName: string;
   duration: number;
   isLoop?: boolean;
   color?: string;
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({
-  uploadId,
+  fileName,
   duration,
   color = "#ED64A6",
   ...props
 }) => {
-  if (!uploadId) return null;
+  if (!fileName) return null;
 
-  const audioUrl = useMemo(() => {
-    return `http://audiochan.s3.amazonaws.com/audios/${uploadId}/source.mp3`;
-  }, [uploadId]);
+  const audioUrl = useMemo(
+    () => `http://audiochan.s3.amazonaws.com/audios/${fileName}`,
+    [fileName]
+  );
 
   const { volume, handleVolume } = useAudioPlayer();
   const [isLoop, isSetLoop] = useState(props.isLoop ?? false);

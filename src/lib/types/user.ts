@@ -10,7 +10,7 @@ export type Profile = {
   username: string;
   aboutMe: string;
   audioCount: number;
-  isFollowing: boolean;
+  isFollowing?: boolean;
   followerCount: number;
   followingCount: number;
   picture: string;

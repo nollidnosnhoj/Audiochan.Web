@@ -79,6 +79,7 @@ export default function AudioUploading(props: AudioUploadingProps) {
                   uploadId: uploadId,
                   fileName: file.name,
                   duration: Math.round(audio.duration),
+                  fileSize: file.size,
                   ...form,
                 };
 

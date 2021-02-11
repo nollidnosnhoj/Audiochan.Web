@@ -43,7 +43,7 @@ function mapAudioToModifyInputs(audio: Audio): AudioRequest {
   return {
     title: audio.title,
     description: audio.description,
-    tags: audio.tags.split(" ").filter((tag) => tag.length > 0),
+    tags: audio.tags,
     isPublic: audio.isPublic,
     genre: audio.genre?.slug,
   };

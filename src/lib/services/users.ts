@@ -2,23 +2,25 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient, UseQueryOptions } from "react-query";
 import { apiErrorToast } from "~/utils/toast";
+import useUser from "../contexts/user_context";
 import request from "../request";
 import { ErrorResponse } from "../types";
 import { Profile } from "../types/user";
 
-export const useFollow = (username: string) => {
-  const [isFollowing, setIsFollowing] = useState<boolean | undefined>(undefined);
+export const useFollow = (username: string, initialData?: boolean) => {
+  const { user } = useUser();
+  const [isFollowing, setIsFollowing] = useState<boolean | undefined>(initialData);
 
   useEffect(() => {
-    const checkIsFollowing = async () => {
-      try {
-        await request(`me/followings/${username}`, { method: "head" });
-        setIsFollowing(true);
-      } catch (err) {
-        setIsFollowing(false);
-      }
-    };
-    checkIsFollowing();
+    if (user && isFollowing === undefined) {
+      request(`me/followings/${username}`, { method: "head" })
+        .then(() => {
+          setIsFollowing(true);
+        })
+        .catch(() => {
+          setIsFollowing(false);
+        });
+    }
   }, []);
 
   const followHandler = async () => {
