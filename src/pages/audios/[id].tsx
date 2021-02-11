@@ -31,14 +31,8 @@ const DynamicAudioPlayer = dynamic(() => import("~/components/Audio/Player"), {
   ssr: false,
 });
 
-interface PageProps {
-  isDevelopment: boolean;
-}
-
 // Fetch the audio detail and render it onto the server.
-export const getServerSideProps: GetServerSideProps<PageProps> = async (
-  context
-) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const queryClient = new QueryClient();
   const id = context.params?.id as string;
   const accessToken = getAccessToken(context);
@@ -50,7 +44,6 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (
     return {
       props: {
         dehydratedState: dehydrate(queryClient),
-        isDevelopment: process.env.NODE_ENV === "development",
       },
     };
   } catch (err) {
@@ -113,30 +106,22 @@ export default function AudioDetailsPage(
         <Box flex="2">
           <Flex>
             <Box flex="1" marginRight={4}>
-              <Picture src={picture} size={200} isEager />
-              {user?.id === audio?.user?.id && (
-                <PictureDropzone
-                  name="image"
-                  image={picture}
-                  disabled={isAddingArtwork}
-                  onChange={async (file) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = () => {
-                      uploadArtwork(reader.result as string).then(
-                        ({ data }) => {
-                          setPicture(data.image);
-                          successfulToast({
-                            title: "Image successfully uploaded.",
-                            message:
-                              "Image may take a couple minutes to update.",
-                          });
-                        }
-                      );
-                    };
-                  }}
-                />
-              )}
+              <Picture
+                src={picture}
+                size={200}
+                isEager
+                disabled={isAddingArtwork}
+                canReplace={user?.id === audio?.user?.id}
+                onReplace={(data) => {
+                  uploadArtwork(data).then(({ data }) => {
+                    setPicture(data.image);
+                    successfulToast({
+                      title: "Image successfully uploaded.",
+                      message: "Image may take a couple minutes to update.",
+                    });
+                  });
+                }}
+              />
             </Box>
             <Box flex="3">
               <AudioDetails
