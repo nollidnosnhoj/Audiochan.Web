@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@chakra-ui/react";
 import * as yup from "yup";
 import { useFormik } from "formik";
+import Router from "next/router";
 import TextInput from "~/components/Form/TextInput";
 import request from "~/lib/request";
 import { passwordRule } from "~/lib/validationSchemas";
@@ -44,11 +45,8 @@ export default function UpdatePassword() {
           },
         });
         resetForm();
-        logout().then(() => {
-          successfulToast({
-            title: "Password changed",
-            message: "Please login again with your new password.",
-          });
+        logout("Please login with your new password").then(() => {
+          Router.push("/login");
         });
       } catch (err) {
         apiErrorToast(err);

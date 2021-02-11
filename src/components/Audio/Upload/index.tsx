@@ -56,17 +56,12 @@ export default function AudioUpload(props: AudioUploadProps) {
         <Flex>
           <Flex flex="1" justifyContent="center">
             <Box padding={4} textAlign="center">
-              <Picture src={picture} size={200} disableNextImage />
-              <PictureDropzone
-                name="image"
-                image={picture}
-                onChange={async (file) => {
-                  const reader = new FileReader();
-                  reader.readAsDataURL(file);
-                  reader.onload = () => {
-                    setPicture(reader.result as string);
-                  };
-                }}
+              <Picture
+                src={picture}
+                size={200}
+                disableNextImage
+                canReplace={true}
+                onReplace={(data) => setPicture(data)}
               />
             </Box>
           </Flex>

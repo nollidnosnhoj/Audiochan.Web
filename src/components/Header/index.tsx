@@ -103,8 +103,19 @@ const Header: React.FC<HeaderProps> = (props) => {
     </Box>
   ) : (
     <>
-      <AuthButton authType="login" />
-      <AuthButton authType="register" display={{ base: "none", md: "flex" }} />
+      <AuthButton
+        initialAuthType="login"
+        colorScheme="gray"
+        size="md"
+        variant="ghost"
+      />
+      <AuthButton
+        colorScheme="primary"
+        size="md"
+        variant="ghost"
+        initialAuthType="register"
+        display={{ base: "none", md: "flex" }}
+      />
     </>
   );
 

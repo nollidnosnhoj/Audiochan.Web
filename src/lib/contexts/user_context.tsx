@@ -16,7 +16,7 @@ import { successfulToast } from "~/utils/toast";
 type UserContextType = {
   user?: CurrentUser;
   login: (inputs: LoginFormValues) => Promise<void>;
-  logout: () => Promise<void>;
+  logout: (message?: string) => Promise<void>;
   updateUser: (updatedUser: CurrentUser) => void;
   isLoading: boolean;
 };
@@ -32,10 +32,8 @@ export function UserProvider(props: PropsWithChildren<UserProviderProps>) {
   const [loading, setLoading] = useState(false);
 
   async function authenticate(inputs: LoginFormValues) {
-    try {
-      await login(inputs);
-      await fetchAuthenticatedUser();
-    } catch (err) {}
+    await login(inputs);
+    await fetchAuthenticatedUser();
   }
 
   const updateUser = (updatedUser: CurrentUser | undefined) => {
@@ -53,11 +51,13 @@ export function UserProvider(props: PropsWithChildren<UserProviderProps>) {
     }
   };
 
-  async function deauthenticate() {
+  async function deauthenticate(logoutMessage?: string) {
     try {
       await revokeRefreshToken();
       updateUser(undefined);
-      successfulToast({ message: "You have successfully logged out." });
+      successfulToast({
+        message: logoutMessage ?? "You have successfully logged out.",
+      });
     } catch (err) {
       console.error(err);
     }

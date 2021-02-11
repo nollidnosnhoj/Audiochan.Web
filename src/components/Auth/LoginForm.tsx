@@ -25,9 +25,8 @@ export default function LoginForm(props: LoginFormProps) {
         successfulToast({ message: "You have logged in successfully. " });
         if (props.onSuccess) props.onSuccess();
       } catch (err) {
-        apiErrorToast(err);
-      } finally {
         setSubmitting(false);
+        apiErrorToast(err);
       }
     },
     initialValues: {

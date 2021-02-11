@@ -23,7 +23,6 @@ export default async (req: NextApiRequest, res: NextApiResponse ) => {
     setRefreshTokenCookie(data.refreshToken, data.refreshTokenExpires, { res });
     res.status(status).json({ accessToken: data.accessToken });
   } catch (err) {
-    console.log(err);
     if (!isAxiosError(err)) {
       res.status(500);
     } else {
