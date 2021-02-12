@@ -1,9 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
-import WaveSurfer, { WaveSurferParams } from "wavesurfer.js";
-
-const createWavesurfer = (options: WaveSurferParams): WaveSurfer => {
-  return WaveSurfer.create(options);
-};
+import WaveSurfer from "wavesurfer.js";
+import { createWavesurfer } from "~/utils/wavesurfer";
 
 const WavesurferContext = createContext<WaveSurfer | null>(null);
 
