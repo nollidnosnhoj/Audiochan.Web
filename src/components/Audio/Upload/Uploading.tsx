@@ -1,27 +1,13 @@
 import axios from "axios";
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Progress,
-  Spinner,
-  Stack,
-  VStack,
-} from "@chakra-ui/react";
-import React, { useCallback, useEffect, useState } from "react";
+import { Box, Flex, Heading, Progress, Stack, Text } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
 import Router from "next/router";
-import NextLink from "next/link";
-import request from "~/lib/request";
-import {
-  addAudioPicture,
-  useAddAudioPicture,
-  useCreateAudio,
-} from "~/lib/services/audio";
-import { objectToFormData } from "~/utils";
-import { apiErrorToast, errorToast, successfulToast } from "~/utils/toast";
+import { addAudioPicture, useCreateAudio } from "~/lib/services/audio";
 import useUser from "~/lib/contexts/user_context";
 import { AudioRequest } from "~/lib/types/audio";
+import { objectToFormData } from "~/utils";
+import api from "~/utils/api";
+import { successfulToast } from "~/utils/toast";
 
 interface AudioUploadingProps {
   file: File;
@@ -48,16 +34,17 @@ export default function AudioUploading(props: AudioUploadingProps) {
   const [progress, setProgress] = useState(0);
   const [audioId, setAudioId] = useState(0);
   const [completed, setCompleted] = useState(false);
+  const [error, setError] = useState("");
   const { mutateAsync: createAudio } = useCreateAudio();
 
   useEffect(() => {
     if (file && user) {
-      request<S3PresignedUrl>("upload", {
-        method: "post",
-        data: { fileName: file.name },
-      })
+      // Get Pre-Signed Url from Server
+      api
+        .post<S3PresignedUrl>("upload", { fileName: file.name })
         .then(({ data }) => {
           setStage(1);
+          // Upload binary file using the provided upload link
           const { url, uploadId } = data;
           axios
             .put(url, file, {
@@ -72,6 +59,9 @@ export default function AudioUploading(props: AudioUploadingProps) {
             })
             .then(() => {
               setStage(2);
+              // Get additional audio information from audio element,
+              // and send a request to the server to create audio using
+              // the provided upload id
               var audio = new Audio();
               audio.src = window.URL.createObjectURL(file);
               audio.onloadedmetadata = () => {
@@ -93,32 +83,43 @@ export default function AudioUploading(props: AudioUploadingProps) {
                     }
                   })
                   .catch((err) => {
-                    apiErrorToast(err);
+                    // TODO: Add logging
+                    setError(
+                      "Unable to create audio. Please contact administrators."
+                    );
                   });
               };
             })
             .catch(() => {
-              errorToast({
-                message: "Unable to upload audio.",
-              });
+              // TODO: Add logging
+              setError(
+                "Unable to upload audio. Please contact administrators."
+              );
             });
         })
         .catch(() => {
-          errorToast({ message: "Unable to receive upload Url." });
+          // TODO: Add logging
+          setError("Unable to upload audio. Please contact administrators.");
         });
     }
   }, [file]);
 
+  // Once the audio is created (audioId is provided)
+  // Upload picture if provided.
   useEffect(() => {
     if (audioId > 0 && picture) {
       addAudioPicture(audioId, picture)
-        .then(() => {
-          setCompleted(true);
+        .catch((err) => {
+          // TODO: Add Logging
         })
-        .catch((err) => apiErrorToast(err));
+        .finally(() => {
+          setCompleted(true);
+        });
     }
   }, [audioId, picture]);
 
+  // Once the state of the uploading process is completed,
+  // Push the user into the audio detail page.
   useEffect(() => {
     if (completed && audioId > 0) {
       Router.push(`audios/${audioId}`).then(() => {
@@ -130,8 +131,14 @@ export default function AudioUploading(props: AudioUploadingProps) {
     }
   }, [completed, audioId]);
 
-  if (!file || !user) {
-    return null;
+  if (!file) {
+    return <Text>File is required.</Text>;
+  }
+
+  if (error) {
+    <Flex justify="center" align="center" height="50vh">
+      <Heading>{error}</Heading>
+    </Flex>;
   }
 
   return (

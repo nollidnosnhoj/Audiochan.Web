@@ -28,6 +28,7 @@ export default function AudioUpload(props: AudioUploadProps) {
       description: "",
       tags: [],
       isPublic: true,
+      isLoop: false,
       genre: "",
     },
     onSubmit: (values) => {
@@ -109,6 +110,15 @@ export default function AudioUpload(props: AudioUploadProps) {
               onChange={() => setFieldValue("isPublic", !values.isPublic)}
               error={errors.isPublic}
               label="Public?"
+              required
+              toggleSwitch
+            />
+            <InputCheckbox
+              name="isLoop"
+              value={values.isLoop}
+              onChange={() => setFieldValue("isLoop", !values.isLoop)}
+              error={errors.isLoop}
+              label="Loop?"
               required
               toggleSwitch
             />

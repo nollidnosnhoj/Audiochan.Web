@@ -7,9 +7,9 @@ import React, {
   useState,
 } from "react";
 import { LoginFormValues } from "~/components/Auth/LoginForm";
-import fetcher from "../fetcher";
 import { login, revokeRefreshToken } from "../services/auth";
 import { CurrentUser } from "../types/user";
+import api from "~/utils/api";
 import { getAccessToken } from "~/utils/cookies";
 import { successfulToast } from "~/utils/toast";
 
@@ -43,8 +43,9 @@ export function UserProvider(props: PropsWithChildren<UserProviderProps>) {
   const fetchAuthenticatedUser = () => {
     return new Promise<CurrentUser>((resolve, reject) => {
       setLoadingUser(() => true);
-      fetcher<CurrentUser>("me")
-        .then((data) => {
+      api
+        .get<CurrentUser>("me")
+        .then(({ data }) => {
           setUser(data);
           resolve(data);
         })

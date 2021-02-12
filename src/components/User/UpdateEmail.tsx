@@ -1,12 +1,12 @@
 import { Button } from "@chakra-ui/react";
+import React from "react";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import TextInput from "~/components/Form/TextInput";
 import useUser from "~/lib/contexts/user_context";
-import request from "~/lib/request";
-import { apiErrorToast } from "~/utils/toast";
-import React from "react";
 import { validationMessages } from "~/utils";
+import api from "~/utils/api";
+import { apiErrorToast } from "~/utils/toast";
 
 export default function UpdateEmail() {
   const { user, updateUser } = useUser();
@@ -24,7 +24,7 @@ export default function UpdateEmail() {
       if (email.trim() === user?.email) return;
 
       try {
-        await request("me/change-email", { method: "patch", data: email });
+        await api.patch("me/change-email", { email });
         if (user) {
           updateUser({ ...user, email: email.trim() });
         }

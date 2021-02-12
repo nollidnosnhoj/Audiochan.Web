@@ -1,11 +1,11 @@
 
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient, UseQueryOptions } from "react-query";
-import { apiErrorToast } from "~/utils/toast";
 import useUser from "../contexts/user_context";
-import request from "../request";
 import { ErrorResponse } from "../types";
 import { Profile } from "../types/user";
+import api from '~/utils/api';
+import { apiErrorToast } from "~/utils/toast";
 
 export const useFollow = (username: string, initialData?: boolean) => {
   const { user } = useUser();
@@ -13,7 +13,7 @@ export const useFollow = (username: string, initialData?: boolean) => {
 
   useEffect(() => {
     if (user && isFollowing === undefined) {
-      request(`me/followings/${username}`, { method: "head" })
+      api.head(`me/following/${username}`)
         .then(() => {
           setIsFollowing(true);
         })
@@ -23,15 +23,11 @@ export const useFollow = (username: string, initialData?: boolean) => {
     }
   }, []);
 
-  const followHandler = async () => {
-    try {
-      await request(`me/followings/${username}`, {
-        method: isFollowing ? "delete" : "put",
-      });
-      setIsFollowing(!isFollowing);
-    } catch (err) {
-      apiErrorToast(err);
-    }
+  const followHandler = () => {
+    const method = isFollowing ? 'DELETE' : 'PUT';
+    api.request(`me/followings/${username}`, method)
+      .then(() => setIsFollowing(!isFollowing))
+      .catch(err => apiErrorToast(err));
   }
 
   return { isFollowing, follow: followHandler };
@@ -42,8 +38,7 @@ interface FetchUserProfileOptions {
 }
 
 export const fetchUserProfile = async (username: string, options: FetchUserProfileOptions = {}) => {
-  const { data } = await request<Profile>(`users/${username}`, {
-    method: 'get',
+  const { data } = await api.get<Profile>(`users/${username}`, {
     accessToken: options.accessToken
   });
 
@@ -56,12 +51,8 @@ export const useProfile = (username: string, options: UseQueryOptions<Profile, E
 
 export const useAddUserPicture = (username: string) => {
   const queryClient = useQueryClient();
-  const uploadArtwork = async (data: string) => {
-    return await request<{ image: string }>(`me/picture`, {
-      method: 'patch',
-      data: { data }
-    });
-  }
+  const uploadArtwork = async (data: string) => 
+    await api.patch<{ image: string}>(`me/picture`, { data });
 
   return useMutation(uploadArtwork, {
     onSuccess() {

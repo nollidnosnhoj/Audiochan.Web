@@ -6,7 +6,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { Genre } from "~/lib/types/genre";
-import fetch from "~/lib/fetcher";
+import api from "~/utils/api";
 
 interface GenreSelectProps {
   name: string;
@@ -32,7 +32,7 @@ const GenreSelect: React.FC<GenreSelectProps> = ({
   useEffect(() => {
     async function getGenres() {
       try {
-        const data = await fetch<Genre[]>("genres");
+        const { data } = await api.get<Genre[]>("genres");
         setGenres(data);
       } catch (err) {
         setGenres([]);

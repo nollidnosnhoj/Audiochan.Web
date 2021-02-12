@@ -4,8 +4,8 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import TextInput from "~/components/Form/TextInput";
 import useUser from "~/lib/contexts/user_context";
-import request from "~/lib/request";
 import { usernameRule } from "~/lib/validationSchemas";
+import api from "~/utils/api";
 import { apiErrorToast } from "~/utils/toast";
 
 export default function UpdateUsername() {
@@ -24,10 +24,7 @@ export default function UpdateUsername() {
       if (username.toLowerCase() === user?.username) return;
 
       try {
-        await request("me/change-username", {
-          method: "patch",
-          data: username,
-        });
+        await api.patch("me/change-username", { username });
         if (user) {
           updateUser({ ...user, username: username });
         }

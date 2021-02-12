@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { AuthResult } from '~/lib/types';
-import request from '~/lib/request';
+import api from '~/utils/api';
 import { isAxiosError } from '~/utils/axios';
 import { setAccessTokenCookie, setRefreshTokenCookie } from '~/utils/cookies'
 
@@ -16,11 +16,9 @@ export default async (req: NextApiRequest, res: NextApiResponse<AuthResult>) => 
       res.status(404).end();
     }
 
-    const { status, data } = await request<BackendAuthResult>('auth/login', {
-      method: 'post',
-      data: req.body,
+    const { status, data } = await api.post('auth/login', req.body, {
       skipAuthRefresh: true
-    });
+    })
 
     setAccessTokenCookie(data.accessToken, { res });
     setRefreshTokenCookie(data.refreshToken, data.refreshTokenExpires, { res });

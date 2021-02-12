@@ -4,9 +4,9 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import Router from "next/router";
 import TextInput from "~/components/Form/TextInput";
-import request from "~/lib/request";
 import { passwordRule } from "~/lib/validationSchemas";
-import { apiErrorToast, successfulToast } from "~/utils/toast";
+import api from "~/utils/api";
+import { apiErrorToast } from "~/utils/toast";
 import { validationMessages } from "~/utils";
 import useUser from "~/lib/contexts/user_context";
 
@@ -37,12 +37,9 @@ export default function UpdatePassword() {
     onSubmit: async (values, { resetForm, setSubmitting }) => {
       const { currentPassword, newPassword } = values;
       try {
-        await request("me/password", {
-          method: "patch",
-          data: {
-            currentPassword: currentPassword,
-            newPassword: newPassword,
-          },
+        await api.patch("me/password", {
+          currentPassword: currentPassword,
+          newPassword: newPassword,
         });
         resetForm();
         logout("Please login with your new password").then(() => {

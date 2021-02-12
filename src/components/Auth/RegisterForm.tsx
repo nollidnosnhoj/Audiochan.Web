@@ -2,12 +2,12 @@ import React from "react";
 import { Button, Flex, Text } from "@chakra-ui/react";
 import * as yup from "yup";
 import { useFormik } from "formik";
+import InputCheckbox from "../Form/Checkbox";
 import TextInput from "../Form/TextInput";
 import { passwordRule, usernameRule } from "~/lib/validationSchemas";
-import request from "~/lib/request";
-import { apiErrorToast, successfulToast } from "~/utils/toast";
 import { validationMessages } from "~/utils";
-import InputCheckbox from "../Form/Checkbox";
+import api from "~/utils/api";
+import { apiErrorToast, successfulToast } from "~/utils/toast";
 
 type RegisterFormInputs = {
   username: string;
@@ -50,11 +50,7 @@ export default function RegisterForm() {
       };
 
       try {
-        await request("auth/register", {
-          method: "post",
-          data: registrationRequest,
-        });
-
+        await api.post("auth/register", registrationRequest);
         successfulToast({
           title: "Thank you for registering.",
           message: "You can now login to your account.",

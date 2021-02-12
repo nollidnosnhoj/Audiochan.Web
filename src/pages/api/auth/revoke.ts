@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import request from '~/lib/request';
 import { isAxiosError } from '~/utils/axios';
+import api from '~/utils/api';
 import { getRefreshToken, setAccessTokenCookie, setRefreshTokenCookie } from '~/utils/cookies'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -14,9 +14,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const body = { refreshToken: refreshToken };
 
   try {
-    const { status } = await request('auth/revoke', {
-      method: 'post',
-      data: body,
+    const { status } = await api.post('auth/revoke', body, {
       skipAuthRefresh: true
     });
 

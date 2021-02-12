@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation, UseQueryOptions, useQueryClient } from 'react-query'
 import queryString from 'query-string'
+import api, { fetch } from '~/utils/api';
 import { apiErrorToast } from '~/utils/toast';
-import request from '../request'
 import { ErrorResponse, PagedList, PaginatedOptions } from '../types';
 import { Audio, AudioSearchType } from '../types/audio'
 import usePagination from '../hooks/usePagination';
@@ -13,8 +13,7 @@ interface FetchAudioByIdOptions {
 }
 
 export const fetchAudioById = async (id: string, options: FetchAudioByIdOptions = {}) => {
-  const { data } = await request<Audio>(`audios/${id}`, { 
-    method: 'get',
+  const { data } = await api.get<Audio>(`audios/${id}`, { 
     accessToken: options.accessToken
   });
   return data;
@@ -53,8 +52,7 @@ export const useAudiosInfiniteQuery = (options: useAudiosPaginatedOptions = { ty
 
   const fetchAudios = async (page: number = 1) => {
     const qs = `?page=${page}&${queryString.stringify(params)}`
-    const { data } = await request<PagedList<Audio>>(key + qs);
-    return data;
+    return await fetch<PagedList<Audio>>(key + qs);
   }
 
   return useInfinitePagination<Audio>(key, fetchAudios, params);
@@ -70,8 +68,7 @@ export const useAudiosPaginatedQuery = (options: useAudiosPaginatedOptions = { t
 
   const fetchAudios = async (page: number) => {
     const qs = `?page=${page}&${queryString.stringify(params)}`
-    const { data } = await request<PagedList<Audio>>(key + qs);
-    return data;
+    return await fetch<PagedList<Audio>>(key + qs);
   }
 
   return usePagination(key, fetchAudios, params);
@@ -84,7 +81,7 @@ export const useFavorite = (audioId: number, initialData?: boolean) => {
     if (isFavorite === undefined) {
       (async () => {
         try {
-          await request(`favorites/audios/${audioId}`, { method: "head" });
+          await api.head(`favorites/audios/${audioId}`)
           setIsFavorite(true);
         } catch (err) {
           setIsFavorite(false);
@@ -95,9 +92,8 @@ export const useFavorite = (audioId: number, initialData?: boolean) => {
 
   const favoriteHandler = async () => {
     try {
-      await request(`favorites/audios/${audioId}`, {
-        method: isFavorite ? "delete" : "put",
-      });
+      const method = isFavorite ? "delete" : "put"
+      await api.request(`favorites/audios/${audioId}`, method);
       setIsFavorite(!isFavorite);
     } catch (err) {
       apiErrorToast(err);
@@ -110,11 +106,7 @@ export const useFavorite = (audioId: number, initialData?: boolean) => {
 export const useCreateAudio = () => {
   const queryClient = useQueryClient();
   const uploadAudio = async (formData: FormData) => {
-    const { data } = await request<Audio>('audios', {
-      method: 'post',
-      data: formData
-    });
-  
+    const { data } = await api.post<Audio>('audios', formData);
     return data;
   }
 
@@ -124,7 +116,7 @@ export const useCreateAudio = () => {
 export const useEditAudio = (id: number) => {
   const queryClient = useQueryClient();
   const updateAudio = async (input: object) => {
-    const { data } = await request<Audio>(`audios/${id}`, { method: 'put', data: input });
+    const { data } = await api.put<Audio>(`audios/${id}`, input);
     return data;
   }
 
@@ -138,9 +130,7 @@ export const useEditAudio = (id: number) => {
 
 export const useRemoveAudio = (id: number) => {
   const queryClient = useQueryClient();
-  const removeAudio = async () => {
-    return await request(`audios/${id}`, { method: 'delete' });
-  }
+  const removeAudio = async () => await api.delete(`audios/${id}`);
 
   return useMutation(removeAudio, {
     onSuccess() {
@@ -150,12 +140,8 @@ export const useRemoveAudio = (id: number) => {
   })
 }
 
-export const addAudioPicture = async (id: number, data: string) => {
-  return await request<{ image: string }>(`audios/${id}/picture`, {
-    method: 'patch',
-    data: { data }
-  });
-}
+export const addAudioPicture = async (id: number, data: string) =>
+  await api.patch<{ image: string }>(`audios/${id}/picture`, { data });
 
 export const useAddAudioPicture = (id: number) => {
   const queryClient = useQueryClient();
