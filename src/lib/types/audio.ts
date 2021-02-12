@@ -29,5 +29,6 @@ export interface AudioRequest {
   description?: string;
   tags: string[];
   isPublic: boolean;
+  isLoop: boolean;
   genre?: string;
 };

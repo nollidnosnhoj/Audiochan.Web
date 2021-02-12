@@ -45,6 +45,7 @@ function mapAudioToModifyInputs(audio: Audio): AudioRequest {
     description: audio.description,
     tags: audio.tags,
     isPublic: audio.isPublic,
+    isLoop: audio.isLoop,
     genre: audio.genre?.slug,
   };
 }
@@ -168,6 +169,16 @@ const AudioEditModal: React.FC<AudioEditProps> = ({
               value={values.isPublic}
               onChange={() => setFieldValue("isPublic", !values.isPublic)}
               error={errors.isPublic}
+              disabled={isSubmitting || deleting}
+              required
+              toggleSwitch
+            />
+            <InputCheckbox
+              name="isLoop"
+              label="Loop?"
+              value={values.isLoop}
+              onChange={() => setFieldValue("isLoop", !values.isLoop)}
+              error={errors.isLoop}
               disabled={isSubmitting || deleting}
               required
               toggleSwitch

@@ -11,29 +11,28 @@ import WaveSurfer from "wavesurfer.js";
 import WaveSurferComponent from "~/components/Audio/Wavesurfer";
 import { useAudioPlayer } from "~/lib/contexts/audio_player_context";
 import { formatDuration } from "~/utils/time";
+import { Audio } from "~/lib/types/audio";
 
 interface AudioPlayerProps {
-  fileName: string;
-  duration: number;
-  isLoop?: boolean;
+  audio: Audio;
   color?: string;
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({
-  fileName,
-  duration,
+  audio,
   color = "#ED64A6",
   ...props
 }) => {
-  if (!fileName) return null;
+  if (!audio) return null;
 
   const audioUrl = useMemo(
-    () => `http://audiochan.s3.amazonaws.com/audios/${fileName}`,
-    [fileName]
+    () =>
+      `http://audiochan.s3.amazonaws.com/audios/${audio.uploadId}${audio.fileExt}`,
+    [audio]
   );
 
   const { volume, handleVolume } = useAudioPlayer();
-  const [isLoop, isSetLoop] = useState(props.isLoop ?? false);
+  const [isLoop, isSetLoop] = useState(audio.isLoop ?? false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);

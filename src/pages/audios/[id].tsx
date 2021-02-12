@@ -1,11 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Flex,
   useDisclosure,
   Button,
-  Text,
-  Image,
+  Table,
+  Tr,
+  Td,
+  Th,
+  Tag,
+  HStack,
+  Stack,
 } from "@chakra-ui/react";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import dynamic from "next/dynamic";
@@ -24,8 +29,9 @@ import {
   useAudio,
 } from "~/lib/services/audio";
 import { getAccessToken } from "~/utils/cookies";
-import PictureDropzone from "~/components/Shared/Picture/PictureDropzone";
 import { successfulToast } from "~/utils/toast";
+import { formatFileSize } from "~/utils/format";
+import { formatDuration } from "~/utils/time";
 
 const DynamicAudioPlayer = dynamic(() => import("~/components/Audio/Player"), {
   ssr: false,
@@ -70,13 +76,12 @@ export default function AudioDetailsPage(
     staleTime: 1000,
   });
 
-  if (!audio) {
-    return (
-      <Page title="Audio was not found.">
-        <Text>Audio was not found.</Text>
-      </Page>
-    );
-  }
+  if (!audio) return null;
+
+  const {
+    mutateAsync: uploadArtwork,
+    isLoading: isAddingArtwork,
+  } = useAddAudioPicture(audio?.id);
 
   const [picture, setPicture] = useState(() => {
     return audio?.picture
@@ -84,21 +89,12 @@ export default function AudioDetailsPage(
       : "";
   });
 
-  const {
-    mutateAsync: uploadArtwork,
-    isLoading: isAddingArtwork,
-  } = useAddAudioPicture(audio.id);
-
   return (
     <Page
       title={audio.title ?? "Removed"}
       beforeContainer={
         <Container>
-          <DynamicAudioPlayer
-            uploadId={audio.uploadId}
-            isLoop={audio.isLoop}
-            duration={audio.duration}
-          />
+          <DynamicAudioPlayer audio={audio} />
         </Container>
       }
     >
@@ -134,11 +130,15 @@ export default function AudioDetailsPage(
           </Flex>
         </Box>
         <Box flex="1">
-          {user && user.id === audio.user?.id && (
-            <Button width="100%" onClick={onEditOpen} colorScheme="primary">
-              Edit
-            </Button>
-          )}
+          <Stack direction="column" spacing={4}>
+            {user && user.id === audio.user?.id && (
+              <Box>
+                <Button width="100%" onClick={onEditOpen} colorScheme="primary">
+                  Edit
+                </Button>
+              </Box>
+            )}
+          </Stack>
         </Box>
       </Flex>
       <AudioEdit audio={audio} isOpen={isEditOpen} onClose={onEditClose} />

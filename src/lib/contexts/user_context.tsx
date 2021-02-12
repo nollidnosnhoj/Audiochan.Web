@@ -16,7 +16,7 @@ import { successfulToast } from "~/utils/toast";
 type UserContextType = {
   user?: CurrentUser;
   login: (inputs: LoginFormValues) => Promise<void>;
-  logout: (message?: string) => Promise<void>;
+  logout: (message?: string) => Promise<boolean>;
   updateUser: (updatedUser: CurrentUser) => void;
   isLoading: boolean;
 };
@@ -29,7 +29,7 @@ interface UserProviderProps {
 
 export function UserProvider(props: PropsWithChildren<UserProviderProps>) {
   const [user, setUser] = useState<CurrentUser | undefined>(props.initialUser);
-  const [loading, setLoading] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(false);
 
   async function authenticate(inputs: LoginFormValues) {
     await login(inputs);
@@ -40,27 +40,34 @@ export function UserProvider(props: PropsWithChildren<UserProviderProps>) {
     setUser(updatedUser);
   };
 
-  const fetchAuthenticatedUser = async () => {
-    try {
-      setLoading(true);
-      const fetchedUser = await fetcher<CurrentUser>("me");
-      setUser(fetchedUser);
-    } catch (err) {
-    } finally {
-      setLoading(false);
-    }
+  const fetchAuthenticatedUser = () => {
+    return new Promise<CurrentUser>((resolve, reject) => {
+      setLoadingUser(() => true);
+      fetcher<CurrentUser>("me")
+        .then((data) => {
+          setUser(data);
+          resolve(data);
+        })
+        .catch((err) => {
+          deauthenticate().then(() => reject(err));
+        })
+        .finally(() => setLoadingUser(() => false));
+    });
   };
 
-  async function deauthenticate(logoutMessage?: string) {
-    try {
-      await revokeRefreshToken();
-      updateUser(undefined);
-      successfulToast({
-        message: logoutMessage ?? "You have successfully logged out.",
-      });
-    } catch (err) {
-      console.error(err);
-    }
+  function deauthenticate(logoutMessage?: string) {
+    return new Promise<boolean>((resolve, reject) => {
+      revokeRefreshToken()
+        .then(() => {
+          updateUser(undefined);
+          successfulToast({
+            title: "You have logged out.",
+            message: logoutMessage,
+          });
+          resolve(true);
+        })
+        .catch((err) => reject(err));
+    });
   }
 
   useEffect(() => {
@@ -76,9 +83,9 @@ export function UserProvider(props: PropsWithChildren<UserProviderProps>) {
       updateUser,
       login: authenticate,
       logout: deauthenticate,
-      isLoading: loading,
+      isLoading: loadingUser,
     }),
-    [user, loading]
+    [user, loadingUser]
   );
 
   return (
