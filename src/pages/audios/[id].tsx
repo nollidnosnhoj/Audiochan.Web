@@ -1,17 +1,5 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Flex,
-  useDisclosure,
-  Button,
-  Table,
-  Tr,
-  Td,
-  Th,
-  Tag,
-  HStack,
-  Stack,
-} from "@chakra-ui/react";
+import React from "react";
+import { Box, Flex, useDisclosure, Button, Stack } from "@chakra-ui/react";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
@@ -20,18 +8,11 @@ import { dehydrate } from "react-query/hydration";
 import AudioDetails from "~/components/Audio/Details";
 import Container from "~/components/Shared/Container";
 import Page from "~/components/Shared/Page";
-import Picture from "~/components/Shared/Picture";
 import AudioEdit from "~/components/Audio/Edit";
 import useUser from "~/lib/contexts/user_context";
-import {
-  fetchAudioById,
-  useAddAudioPicture,
-  useAudio,
-} from "~/lib/services/audio";
+import { fetchAudioById, useAudio } from "~/lib/services/audio";
 import { getAccessToken } from "~/utils/cookies";
-import { successfulToast } from "~/utils/toast";
-import { formatFileSize } from "~/utils/format";
-import { formatDuration } from "~/utils/time";
+import AudioInfo from "~/components/Audio/Info";
 
 const DynamicAudioPlayer = dynamic(() => import("~/components/Audio/Player"), {
   ssr: false,
@@ -78,17 +59,6 @@ export default function AudioDetailsPage(
 
   if (!audio) return null;
 
-  const {
-    mutateAsync: uploadArtwork,
-    isLoading: isAddingArtwork,
-  } = useAddAudioPicture(audio?.id);
-
-  const [picture, setPicture] = useState(() => {
-    return audio?.picture
-      ? `https://audiochan.s3.amazonaws.com/${audio.picture}`
-      : "";
-  });
-
   return (
     <Page
       title={audio.title ?? "Removed"}
@@ -100,34 +70,7 @@ export default function AudioDetailsPage(
     >
       <Flex>
         <Box flex="2">
-          <Flex>
-            <Box flex="1" marginRight={4}>
-              <Picture
-                src={picture}
-                size={200}
-                isEager
-                disabled={isAddingArtwork}
-                canReplace={user?.id === audio?.user?.id}
-                onReplace={(data) => {
-                  uploadArtwork(data).then(({ data }) => {
-                    setPicture(data.image);
-                    successfulToast({
-                      title: "Image successfully uploaded.",
-                      message: "Image may take a couple minutes to update.",
-                    });
-                  });
-                }}
-              />
-            </Box>
-            <Box flex="3">
-              <AudioDetails
-                title={audio.title ?? ""}
-                description={audio.description ?? ""}
-                username={audio.user?.username ?? "ERROR"}
-                created={audio.created ?? ""}
-              />
-            </Box>
-          </Flex>
+          <AudioDetails audio={audio} />
         </Box>
         <Box flex="1">
           <Stack direction="column" spacing={4}>
@@ -138,6 +81,7 @@ export default function AudioDetailsPage(
                 </Button>
               </Box>
             )}
+            <AudioInfo audio={audio} />
           </Stack>
         </Box>
       </Flex>
