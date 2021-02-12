@@ -33,7 +33,6 @@ function App({ Component, user, pageProps }: AppProps) {
             </AudioPlayerProvider>
           </UserProvider>
         </ChakraProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
       </Hydrate>
     </QueryClientProvider>
   );
