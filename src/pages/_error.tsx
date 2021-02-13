@@ -1,6 +1,7 @@
 import React from "react";
 import { NextPage } from "next";
 import { Flex, Heading, Text } from "@chakra-ui/react";
+import Page from "~/components/Shared/Page";
 
 function getErrorMessage(statusCode?: number) {
   switch (statusCode) {
@@ -17,10 +18,12 @@ function getErrorMessage(statusCode?: number) {
 
 const ErrorPage: NextPage<{ statusCode?: number }> = ({ statusCode }) => {
   return (
-    <Flex alignItems="center" justifyContent="center">
-      <Heading as="h1">{statusCode || "Error"}</Heading>
-      <Text as="p">{getErrorMessage(statusCode)}</Text>
-    </Flex>
+    <Page title="Uh oh">
+      <Flex alignItems="center" justifyContent="center">
+        <Heading as="h1">{statusCode || "Error"}</Heading>
+        <Text as="p">{getErrorMessage(statusCode)}</Text>
+      </Flex>
+    </Page>
   );
 };
 
