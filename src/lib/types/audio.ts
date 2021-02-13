@@ -32,3 +32,10 @@ export interface AudioRequest {
   isLoop: boolean;
   genre?: string;
 };
+
+export interface CreateAudioRequest extends AudioRequest {
+  uploadId: string;
+  fileName: string;
+  duration: number;
+  fileSize: number;
+}

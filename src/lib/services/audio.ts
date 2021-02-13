@@ -4,7 +4,7 @@ import queryString from 'query-string'
 import api, { fetch } from '~/utils/api';
 import { apiErrorToast } from '~/utils/toast';
 import { ErrorResponse, PagedList, PaginatedOptions } from '../types';
-import { Audio, AudioSearchType } from '../types/audio'
+import { Audio, AudioSearchType, CreateAudioRequest } from '../types/audio'
 import usePagination from '../hooks/usePagination';
 import useInfinitePagination from '../hooks/useInfinitePagination';
 
@@ -105,8 +105,8 @@ export const useFavorite = (audioId: number, initialData?: boolean) => {
 
 export const useCreateAudio = () => {
   const queryClient = useQueryClient();
-  const uploadAudio = async (formData: FormData) => {
-    const { data } = await api.post<Audio>('audios', formData);
+  const uploadAudio = async (request: CreateAudioRequest) => {
+    const { data } = await api.post<Audio>('audios', request);
     return data;
   }
 

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Router from "next/router";
 import { addAudioPicture, useCreateAudio } from "~/lib/services/audio";
 import useUser from "~/lib/contexts/user_context";
-import { AudioRequest } from "~/lib/types/audio";
+import { AudioRequest, CreateAudioRequest } from "~/lib/types/audio";
 import { objectToFormData } from "~/utils";
 import api from "~/utils/api";
 import { successfulToast } from "~/utils/toast";
@@ -65,15 +65,21 @@ export default function AudioUploading(props: AudioUploadingProps) {
               var audio = new Audio();
               audio.src = window.URL.createObjectURL(file);
               audio.onloadedmetadata = () => {
-                const body = {
+                const body: CreateAudioRequest = {
                   uploadId: uploadId,
                   fileName: file.name,
                   duration: Math.round(audio.duration),
                   fileSize: file.size,
-                  ...form,
+                  ...(form ?? {
+                    title: "",
+                    description: "",
+                    tags: [],
+                    isPublic: true,
+                    isLoop: false,
+                  }),
                 };
 
-                createAudio(objectToFormData(body))
+                createAudio(body)
                   .then(({ id }) => {
                     setAudioId(id);
                     if (picture) {
