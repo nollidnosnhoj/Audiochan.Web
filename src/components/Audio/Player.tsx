@@ -12,6 +12,7 @@ import WaveSurferComponent from "~/components/Audio/Wavesurfer";
 import { useAudioPlayer } from "~/lib/contexts/audio_player_context";
 import { formatDuration } from "~/utils/time";
 import { Audio } from "~/lib/types/audio";
+import { createWavesurfer } from "~/utils/wavesurfer";
 
 interface AudioPlayerProps {
   audio: Audio;
@@ -23,103 +24,117 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   color = "#ED64A6",
   ...props
 }) => {
-  if (!audio) return null;
-
   const audioUrl = useMemo(
     () =>
       `http://audiochan.s3.amazonaws.com/audios/${audio.uploadId}${audio.fileExt}`,
     [audio]
   );
 
-  const { volume, handleVolume } = useAudioPlayer();
-  const [isLoop, isSetLoop] = useState(audio.isLoop ?? false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadingProgress, setLoadingProgress] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [seconds, setSeconds] = useState(0);
-  const wavesurferRef = useRef<WaveSurfer | null>(null);
-  const handleMount = useCallback(
-    (ws: WaveSurfer) => {
-      wavesurferRef.current = ws;
-      if (wavesurferRef.current) {
-        wavesurferRef.current.load(audioUrl);
-        wavesurferRef.current.on("ready", () => {
-          console.log("audio ready");
-          setIsLoading(false);
-        });
-        wavesurferRef.current.on("volume", (level: number) => {
-          handleVolume(level);
-        });
-        wavesurferRef.current.on("loading", (data: number) => {
-          setLoadingProgress(data);
-        });
-        wavesurferRef.current.on("seek", () => {
-          if (wavesurferRef.current) {
-            setSeconds(wavesurferRef.current.getCurrentTime());
-          }
-        });
-        wavesurferRef.current.on("audioprocess", () => {
-          if (wavesurferRef.current) {
-            setSeconds(wavesurferRef.current.getCurrentTime());
-          }
-        });
-        wavesurferRef.current.on("finish", () => {
-          setSeconds(0);
-          if (!isLoop) setIsPlaying(false);
-          else wavesurferRef.current?.play();
-        });
+  const {
+    volume,
+    playing,
+    currentAudio,
+    position,
+    handlePlaying,
+    handlePosition,
+    setCurrentAudio,
+    handleVolume,
+  } = useAudioPlayer();
+  const wavesurferRef = useRef<HTMLDivElement | null>(null);
+  const wavesurfer = useRef<WaveSurfer | null>(null);
+
+  const onPlayPause = useCallback(() => {
+    if (wavesurfer.current) {
+      if (playing) {
+        wavesurfer.current.pause();
+        handlePlaying(false);
+      } else {
+        wavesurfer.current.play();
+        handlePlaying(true);
       }
-    },
-    [audioUrl]
-  );
+    }
+  }, [playing, handlePlaying]);
 
-  const handleUnmount = () => {
-    wavesurferRef.current?.unAll();
-    wavesurferRef.current?.destroy();
-    if (wavesurferRef.current) wavesurferRef.current = null;
-  };
-
-  const onPlayPause = () => {
-    wavesurferRef.current?.playPause();
-    setIsPlaying(wavesurferRef.current?.isPlaying() ?? false);
-  };
+  const destroyWavesurferIfDefined = useCallback(() => {
+    if (wavesurfer.current) {
+      wavesurfer.current.unAll();
+      wavesurfer.current.destroy();
+      wavesurfer.current = null;
+    }
+  }, [wavesurfer.current]);
 
   useEffect(() => {
-    if (wavesurferRef.current) {
-      wavesurferRef.current.setVolume(volume);
+    if (audio) {
+      setCurrentAudio(audio);
+    }
+  }, [audio]);
+
+  useEffect(() => {
+    if (currentAudio) {
+      destroyWavesurferIfDefined();
+      wavesurfer.current = createWavesurfer(wavesurferRef, {
+        waveColor: "#EDF2F7",
+        progressColor: "#ED64A6",
+        backend: "MediaElement",
+      });
+      if (wavesurfer.current) {
+        wavesurfer.current.load(audioUrl);
+        wavesurfer.current.on("volume", (level: number) => {
+          handleVolume(level);
+        });
+        wavesurfer.current.on("seek", () => {
+          if (wavesurfer.current) {
+            handlePosition(wavesurfer.current.getCurrentTime());
+          }
+        });
+        wavesurfer.current.on("audioprocess", () => {
+          if (wavesurfer.current) {
+            handlePosition(wavesurfer.current.getCurrentTime());
+          }
+        });
+        wavesurfer.current.on("finish", () => {
+          if (wavesurfer.current) {
+            wavesurfer.current.seekTo(0);
+            handlePosition(0);
+            if (currentAudio?.isLoop) {
+              wavesurfer.current.play();
+            } else {
+              handlePlaying(false);
+            }
+          }
+        });
+      }
+    }
+
+    return () => destroyWavesurferIfDefined();
+  }, [currentAudio, audioUrl]);
+
+  useEffect(() => {
+    if (wavesurfer.current) {
+      wavesurfer.current.setVolume(volume);
     }
   }, [volume]);
 
   return (
-    <WaveSurferComponent
-      onMount={handleMount}
-      onUnmount={handleUnmount}
-      cursorWidth={1}
-      cursorColor={color}
-      height={150}
-      responsive={true}
-    >
-      <Flex paddingY="0.2rem" paddingX="0.2rem" align="center">
-        <Flex padding="1rem" width="10%" align="center">
-          <Circle
-            size="70px"
-            bg={color}
-            color="white"
-            onClick={onPlayPause}
-            as="button"
-            disabled={isLoading === false && loadingProgress < 100}
-          >
-            {isPlaying ? <IoMdPause size="30px" /> : <IoMdPlay size="30px" />}
-          </Circle>
-        </Flex>
-        <Box width="80%">
-          <div id="wave-form"></div>
-        </Box>
-        <Box width="10%" textAlign="center">
-          <Text fontSize="2xl">{formatDuration(seconds)}</Text>
-        </Box>
+    <Flex paddingY="0.2rem" paddingX="0.2rem" align="center">
+      <Flex padding="1rem" width="10%" align="center">
+        <Circle
+          size="70px"
+          bg={color}
+          color="white"
+          onClick={onPlayPause}
+          as="button"
+        >
+          {playing ? <IoMdPause size="30px" /> : <IoMdPlay size="30px" />}
+        </Circle>
       </Flex>
-    </WaveSurferComponent>
+      <Box width="80%">
+        <Box id="waveform" ref={wavesurferRef}></Box>
+      </Box>
+      <Box width="10%" textAlign="center">
+        <Text fontSize="2xl">{formatDuration(position)}</Text>
+      </Box>
+    </Flex>
   );
 };
 

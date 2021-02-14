@@ -12,7 +12,6 @@ import AudioEdit from "~/components/Audio/Edit";
 import useUser from "~/lib/contexts/user_context";
 import { fetchAudioById, useAudio } from "~/lib/services/audio";
 import { getAccessToken } from "~/utils/cookies";
-import AudioInfo from "~/components/Audio/Info";
 
 const DynamicAudioPlayer = dynamic(() => import("~/components/Audio/Player"), {
   ssr: false,
@@ -81,7 +80,6 @@ export default function AudioDetailsPage(
                 </Button>
               </Box>
             )}
-            <AudioInfo audio={audio} />
           </Stack>
         </Box>
       </Flex>
