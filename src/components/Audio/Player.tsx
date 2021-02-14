@@ -8,7 +8,6 @@ import React, {
 import { Box, Circle, Flex, Text } from "@chakra-ui/react";
 import { IoMdPlay, IoMdPause } from "react-icons/io";
 import WaveSurfer from "wavesurfer.js";
-import WaveSurferComponent from "~/components/Audio/Wavesurfer";
 import { useAudioPlayer } from "~/lib/contexts/audio_player_context";
 import { formatDuration } from "~/utils/time";
 import { Audio } from "~/lib/types/audio";
@@ -95,7 +94,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
         wavesurfer.current.on("finish", () => {
           if (wavesurfer.current) {
             wavesurfer.current.seekTo(0);
-            handlePosition(0);
             if (currentAudio?.isLoop) {
               wavesurfer.current.play();
             } else {
