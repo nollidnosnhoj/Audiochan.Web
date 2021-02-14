@@ -38,10 +38,8 @@ export function AudioPlayerProvider(props: PropsWithChildren<any>) {
   }, []);
 
   useEffect(() => {
-    if (currentAudio) {
-      setLoop(currentAudio.isLoop);
-    }
-  }, [currentAudio]);
+    setLoop(currentAudio?.isLoop ?? false);
+  }, [currentAudio?.isLoop]);
 
   const onAudioChange = useCallback(
     (audio: Audio) => {

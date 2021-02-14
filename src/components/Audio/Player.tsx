@@ -23,12 +23,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   color = "#ED64A6",
   ...props
 }) => {
-  const audioUrl = useMemo(
-    () =>
-      `http://audiochan.s3.amazonaws.com/audios/${audio.uploadId}${audio.fileExt}`,
-    [audio]
-  );
-
   const {
     volume,
     playing,
@@ -39,8 +33,21 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     setCurrentAudio,
     handleVolume,
   } = useAudioPlayer();
+
   const wavesurferRef = useRef<HTMLDivElement | null>(null);
   const wavesurfer = useRef<WaveSurfer | null>(null);
+
+  useEffect(() => {
+    if (audio) {
+      setCurrentAudio(audio);
+    }
+  }, [audio]);
+
+  const audioUrl = useMemo(
+    () =>
+      `http://audiochan.s3.amazonaws.com/audios/${audio.uploadId}${audio.fileExt}`,
+    [currentAudio?.uploadId, currentAudio?.fileExt]
+  );
 
   const onPlayPause = useCallback(() => {
     if (wavesurfer.current) {
@@ -59,14 +66,10 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       wavesurfer.current.unAll();
       wavesurfer.current.destroy();
       wavesurfer.current = null;
+      handlePlaying(false);
+      handlePosition(0);
     }
   }, [wavesurfer.current]);
-
-  useEffect(() => {
-    if (audio) {
-      setCurrentAudio(audio);
-    }
-  }, [audio]);
 
   useEffect(() => {
     if (currentAudio) {
@@ -78,6 +81,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       });
       if (wavesurfer.current) {
         wavesurfer.current.load(audioUrl);
+        wavesurfer.current.setVolume(volume);
         wavesurfer.current.on("volume", (level: number) => {
           handleVolume(level);
         });
@@ -105,7 +109,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     }
 
     return () => destroyWavesurferIfDefined();
-  }, [currentAudio, audioUrl]);
+  }, [currentAudio?.isLoop, audioUrl]);
 
   useEffect(() => {
     if (wavesurfer.current) {
