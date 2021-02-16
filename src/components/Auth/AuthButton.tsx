@@ -12,7 +12,7 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 
@@ -29,6 +29,12 @@ const AuthButton: React.FC<AuthButtonProps & ButtonProps> = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { children, ...buttonProps } = props;
   const [authType, setAuthType] = useState<AuthCommonType>(initialAuthType);
+
+  const handleClosingModal = () => {
+    setAuthType(initialAuthType);
+    onClose();
+  };
+
   return (
     <React.Fragment>
       <Button onClick={onOpen} {...buttonProps}>
@@ -37,7 +43,7 @@ const AuthButton: React.FC<AuthButtonProps & ButtonProps> = ({
             (initialAuthType === "register" && "REGISTER")
           : children}
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={handleClosingModal}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
