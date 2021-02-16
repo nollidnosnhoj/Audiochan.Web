@@ -5,7 +5,14 @@ import React, {
   useEffect,
   useMemo,
 } from "react";
-import { Box, Circle, Flex, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Circle,
+  Flex,
+  Text,
+  useColorMode,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { IoMdPlay, IoMdPause } from "react-icons/io";
 import WaveSurfer from "wavesurfer.js";
 import { useAudioPlayer } from "~/lib/contexts/audio_player_context";
@@ -33,7 +40,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     setCurrentAudio,
     handleVolume,
   } = useAudioPlayer();
-
+  const waveColor = useColorModeValue("#1A202C", "#EDF2F7");
   const wavesurferRef = useRef<HTMLDivElement | null>(null);
   const wavesurfer = useRef<WaveSurfer | null>(null);
 
@@ -75,7 +82,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     if (currentAudio) {
       destroyWavesurferIfDefined();
       wavesurfer.current = createWavesurfer(wavesurferRef, {
-        waveColor: "#EDF2F7",
+        waveColor: waveColor,
         progressColor: "#ED64A6",
         backend: "MediaElement",
       });
@@ -116,6 +123,12 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       wavesurfer.current.setVolume(volume);
     }
   }, [volume]);
+
+  useEffect(() => {
+    if (wavesurfer.current) {
+      wavesurfer.current.setWaveColor(waveColor);
+    }
+  }, [waveColor]);
 
   return (
     <Flex paddingY="0.2rem" paddingX="0.2rem" align="center">
