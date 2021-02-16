@@ -43,7 +43,7 @@ const AudioListItem: React.FC<AudioListItemProps> = ({
       overflow="hidden"
     >
       <Box>
-        <Picture src={picture} size={125} />
+        <Picture src={picture} size={125} borderRightWidth="1px" />
       </Box>
       <Flex width="100%" paddingY={2} paddingX={4}>
         <Box flex="3">

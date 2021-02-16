@@ -1,5 +1,5 @@
-import { Box, Flex, FlexProps, Image, VStack } from "@chakra-ui/react";
-import React, { useMemo } from "react";
+import { Box, BoxProps, Image, VStack } from "@chakra-ui/react";
+import React from "react";
 import NextImage from "next/image";
 import { usePictureGradient } from "~/lib/hooks/usePictureGradient";
 import PictureDropzone from "./PictureDropzone";
@@ -14,7 +14,7 @@ interface PictureProps {
   disabled?: boolean;
 }
 
-const Picture: React.FC<PictureProps & FlexProps> = ({
+const Picture: React.FC<PictureProps & BoxProps> = ({
   src,
   size,
   onReplace,
@@ -44,24 +44,22 @@ const Picture: React.FC<PictureProps & FlexProps> = ({
           <Image src={src} height={size} />
         )}
       </Box>
-      <Box>
-        {canReplace && (
-          <PictureDropzone
-            name="image"
-            image={src}
-            disabled={disabled}
-            onChange={async (file) => {
-              const reader = new FileReader();
-              reader.readAsDataURL(file);
-              reader.onload = () => {
-                if (onReplace) {
-                  onReplace(reader.result as string);
-                }
-              };
-            }}
-          />
-        )}
-      </Box>
+      {canReplace && (
+        <PictureDropzone
+          name="image"
+          image={src}
+          disabled={disabled}
+          onChange={async (file) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+              if (onReplace) {
+                onReplace(reader.result as string);
+              }
+            };
+          }}
+        />
+      )}
     </VStack>
   );
 };
