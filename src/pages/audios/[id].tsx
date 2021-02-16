@@ -1,5 +1,16 @@
 import React from "react";
-import { Box, Flex, useDisclosure, Button, Stack } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  useDisclosure,
+  Button,
+  Stack,
+  VStack,
+  Wrap,
+  WrapItem,
+  Tag,
+  Heading,
+} from "@chakra-ui/react";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
@@ -12,6 +23,7 @@ import AudioEdit from "~/components/Audio/Edit";
 import useUser from "~/lib/contexts/user_context";
 import { fetchAudioById, useAudio } from "~/lib/services/audio";
 import { getAccessToken } from "~/utils/cookies";
+import AudioFeedbacks from "~/components/Audio/Feedbacks";
 
 const DynamicAudioPlayer = dynamic(() => import("~/components/Audio/Player"), {
   ssr: false,
@@ -60,9 +72,12 @@ export default function AudioDetailsPage(
         </Container>
       }
     >
-      <Flex>
+      <Box>
         <AudioDetails audio={audio} />
-      </Flex>
+        <Flex>
+          <AudioFeedbacks audioId={audio.id} flex="3" />
+        </Flex>
+      </Box>
     </Page>
   );
 }
