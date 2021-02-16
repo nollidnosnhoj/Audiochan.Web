@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useQuery, useMutation, UseQueryOptions, useQueryClient } from 'react-query'
 import queryString from 'query-string'
 import api, { fetch } from '~/utils/api';
-import { apiErrorToast } from '~/utils/toast';
+import { apiErrorToast, successfulToast } from '~/utils/toast';
 import { ErrorResponse, PagedList, PaginatedOptions } from '../types';
 import { Audio, AudioSearchType, CreateAudioRequest } from '../types/audio'
 import usePagination from '../hooks/usePagination';
@@ -75,16 +75,20 @@ export const useAudiosPaginatedQuery = (options: useAudiosPaginatedOptions = { t
 }
 
 export const useFavorite = (audioId: number, initialData?: boolean) => {
+  const [isLoading, setLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState<boolean | undefined>(initialData);
 
   useEffect(() => {
     if (isFavorite === undefined) {
       (async () => {
         try {
+          setLoading(true);
           await api.head(`favorites/audios/${audioId}`)
           setIsFavorite(true);
         } catch (err) {
           setIsFavorite(false);
+        } finally {
+          setLoading(false);
         }
       })();
     }
@@ -92,15 +96,21 @@ export const useFavorite = (audioId: number, initialData?: boolean) => {
 
   const favoriteHandler = async () => {
     try {
+      setLoading(true);
       const method = isFavorite ? "delete" : "put"
       await api.request(`favorites/audios/${audioId}`, method);
+      successfulToast({
+        message: isFavorite ? 'You have unfavorited this audio' : 'You have favorited this audio.'
+      })
       setIsFavorite(!isFavorite);
     } catch (err) {
       apiErrorToast(err);
+    } finally {
+      setLoading(false);
     }
   }
 
-  return { isFavorite, favorite: favoriteHandler };
+  return { isFavorite, favorite: favoriteHandler, isLoading };
 }
 
 export const useCreateAudio = () => {

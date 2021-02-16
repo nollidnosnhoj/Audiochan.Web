@@ -42,15 +42,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 export default function AudioDetailsPage(
   props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-  const { user } = useUser();
   const { query } = useRouter();
   const id = query.id as string;
-
-  const {
-    isOpen: isEditOpen,
-    onOpen: onEditOpen,
-    onClose: onEditClose,
-  } = useDisclosure();
 
   const { data: audio } = useAudio(id, {
     staleTime: 1000,
@@ -68,22 +61,8 @@ export default function AudioDetailsPage(
       }
     >
       <Flex>
-        <Box flex="2">
-          <AudioDetails audio={audio} />
-        </Box>
-        <Box flex="1">
-          <Stack direction="column" spacing={4}>
-            {user && user.id === audio.user?.id && (
-              <Box>
-                <Button width="100%" onClick={onEditOpen} colorScheme="primary">
-                  Edit
-                </Button>
-              </Box>
-            )}
-          </Stack>
-        </Box>
+        <AudioDetails audio={audio} />
       </Flex>
-      <AudioEdit audio={audio} isOpen={isEditOpen} onClose={onEditClose} />
     </Page>
   );
 }
