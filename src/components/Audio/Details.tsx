@@ -15,7 +15,7 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 import Router from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { EditIcon } from "@chakra-ui/icons";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import AudioEdit from "./Edit";
@@ -57,6 +57,14 @@ const AudioDetails: React.FC<AudioMetaProps> = ({ audio }) => {
       : "";
   });
 
+  const audioDurationFormatted = useMemo(() => {
+    return formatDuration(audio.duration);
+  }, [audio.duration]);
+
+  const audioCreatedDateRelative = useMemo(() => {
+    return relativeDate(audio.created);
+  }, [audio.created]);
+
   useEffect(() => {
     Router.prefetch(`/users/${audio.user.username}`);
   }, []);
@@ -83,11 +91,12 @@ const AudioDetails: React.FC<AudioMetaProps> = ({ audio }) => {
       </Box>
       <Box flex="3">
         <Stack direction="row" alignItems="center">
-          <Flex>
+          <Stack direction="column" spacing="0" fontSize="sm">
             <Link href={`/users/${audio.user.username}`}>
-              <Text fontSize="sm">{audio.user.username}</Text>
+              <Text fontWeight="500">{audio.user.username}</Text>
             </Link>
-          </Flex>
+            <Text>{audioCreatedDateRelative}</Text>
+          </Stack>
           <Spacer />
           <HStack justifyContent="flex-end">
             {currentUser && currentUser.id !== audio.user.id && (
@@ -115,26 +124,39 @@ const AudioDetails: React.FC<AudioMetaProps> = ({ audio }) => {
           </HStack>
         </Stack>
         <Stack direction="row">
-          <Box>
-            <Flex as="header" alignItems="center" marginBottom={4}>
-              <Heading as="h1" fontSize="3xl" paddingY="2">
+          <Stack direction="column" spacing={2}>
+            <Flex as="header" alignItems="center">
+              <Heading as="h1" fontSize="2xl">
                 {audio.title}
               </Heading>
               <Spacer />
               <VStack spacing={2} alignItems="normal" textAlign="right">
-                {audio.genre && (
-                  <Box>
-                    <Badge>{audio.genre?.name}</Badge>
-                  </Box>
-                )}
-                <Box>{formatDuration(audio.duration)}</Box>
+                <Box>
+                  {audio.genre && (
+                    <Badge fontSize="sm" letterSpacing="1.1" fontWeight="800">
+                      {audio.genre.name}
+                    </Badge>
+                  )}
+                </Box>
+                <Box>{audioDurationFormatted}</Box>
               </VStack>
             </Flex>
             <Text fontSize="sm">{audio.description}</Text>
-            <Text fontSize="xs" as="i">
-              Uploaded {relativeDate(audio.created)}
-            </Text>
-          </Box>
+            {audio.tags && (
+              <Box>
+                <Heading as="h2" fontSize="lg">
+                  Tags
+                </Heading>
+                <Wrap marginTop={2}>
+                  {audio.tags.map((tag, idx) => (
+                    <WrapItem key={idx}>
+                      <Tag size="sm">{tag}</Tag>
+                    </WrapItem>
+                  ))}
+                </Wrap>
+              </Box>
+            )}
+          </Stack>
         </Stack>
       </Box>
       <AudioEdit audio={audio} isOpen={isEditOpen} onClose={onEditClose} />
