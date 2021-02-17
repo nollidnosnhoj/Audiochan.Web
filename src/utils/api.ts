@@ -1,7 +1,7 @@
 import axios, { Method } from 'axios'
 import createAuthRefreshInterceptor, { AxiosAuthRefreshRequestConfig } from 'axios-auth-refresh';
 import config from '~/lib/config';
-import { revokeRefreshToken } from '~/lib/services/auth';
+import { refreshAccessToken, revokeRefreshToken } from '~/lib/services/auth';
 import { isAxiosError } from './axios';
 import { getAccessToken } from './cookies';
 
@@ -15,7 +15,7 @@ export function getBearer(token: string) {
 }
 
 createAuthRefreshInterceptor(backendApiClient, async (failedRequest) => {
-  return revokeRefreshToken().then(({ data }) => {
+  return refreshAccessToken().then((data) => {
     if (failedRequest && isAxiosError(failedRequest) && failedRequest.response) {
       failedRequest.response.config.headers['Authorization'] = getBearer(data.accessToken);
     }

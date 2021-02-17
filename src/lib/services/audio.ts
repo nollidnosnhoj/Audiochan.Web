@@ -74,7 +74,7 @@ export const useAudiosPaginatedQuery = (options: useAudiosPaginatedOptions = { t
   return usePagination(key, fetchAudios, params);
 }
 
-export const useFavorite = (audioId: number, initialData?: boolean) => {
+export const useAudioFavorite = (audioId: number, initialData?: boolean) => {
   const [isLoading, setLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState<boolean | undefined>(initialData);
 
@@ -94,7 +94,7 @@ export const useFavorite = (audioId: number, initialData?: boolean) => {
     }
   }, []);
 
-  const favoriteHandler = async () => {
+  const onFavorite = async () => {
     try {
       setLoading(true);
       const method = isFavorite ? "delete" : "put"
@@ -110,7 +110,7 @@ export const useFavorite = (audioId: number, initialData?: boolean) => {
     }
   }
 
-  return { isFavorite, favorite: favoriteHandler, isLoading };
+  return { isFavorite, onFavorite, isLoading };
 }
 
 export const useCreateAudio = () => {

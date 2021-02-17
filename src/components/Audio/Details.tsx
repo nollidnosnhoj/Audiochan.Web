@@ -21,7 +21,7 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import AudioEdit from "./Edit";
 import Link from "../Shared/Link";
 import Picture from "../Shared/Picture";
-import { useAddAudioPicture, useFavorite } from "~/lib/services/audio";
+import { useAddAudioPicture, useAudioFavorite } from "~/lib/services/audio";
 import { Audio } from "~/lib/types/audio";
 import { formatDuration, relativeDate } from "~/utils/time";
 import { successfulToast } from "~/utils/toast";
@@ -34,10 +34,11 @@ interface AudioMetaProps {
 const AudioDetails: React.FC<AudioMetaProps> = ({ audio }) => {
   const { user: currentUser } = useUser();
 
-  const { isFavorite, favorite, isLoading: isFavoriteLoading } = useFavorite(
-    audio.id,
-    audio.isFavorited
-  );
+  const {
+    isFavorite,
+    onFavorite: favorite,
+    isLoading: isFavoriteLoading,
+  } = useAudioFavorite(audio.id, audio.isFavorited);
 
   const {
     mutateAsync: uploadArtwork,

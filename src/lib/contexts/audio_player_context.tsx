@@ -11,9 +11,11 @@ import { Audio } from "~/lib/types/audio";
 
 interface AudioPlayerContextProps {
   currentAudio: Audio | undefined;
+  loop: boolean;
   volume: number;
   position: number;
   playing: boolean;
+  handleLoop: () => void;
   handleVolume: (level: number) => void;
   handlePosition: (pos: number) => void;
   handlePlaying: (state: boolean) => void;
@@ -80,12 +82,18 @@ export function AudioPlayerProvider(props: PropsWithChildren<any>) {
     [setVolume]
   );
 
+  const onLoopChange = useCallback(() => {
+    setLoop(!loop);
+  }, [loop, setLoop]);
+
   const values = useMemo<AudioPlayerContextProps>(
     () => ({
       currentAudio,
+      loop,
       volume,
       playing,
       position,
+      handleLoop: onLoopChange,
       handleVolume: onVolumeChange,
       handlePlaying: onSetPlaying,
       handlePosition: onPositionChange,

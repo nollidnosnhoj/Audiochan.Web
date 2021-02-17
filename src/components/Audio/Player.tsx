@@ -9,11 +9,12 @@ import {
   Box,
   Circle,
   Flex,
+  IconButton,
   Text,
   useColorMode,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { IoMdPlay, IoMdPause } from "react-icons/io";
+import { IoMdPlay, IoMdPause, IoMdRepeat } from "react-icons/io";
 import WaveSurfer from "wavesurfer.js";
 import { useAudioPlayer } from "~/lib/contexts/audio_player_context";
 import { formatDuration } from "~/utils/time";
@@ -31,6 +32,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   ...props
 }) => {
   const {
+    loop,
     volume,
     playing,
     currentAudio,
@@ -39,6 +41,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     handlePosition,
     setCurrentAudio,
     handleVolume,
+    handleLoop,
   } = useAudioPlayer();
   const waveColor = useColorModeValue("#1A202C", "#EDF2F7");
   const wavesurferRef = useRef<HTMLDivElement | null>(null);
@@ -102,21 +105,30 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
             handlePosition(wavesurfer.current.getCurrentTime());
           }
         });
-        wavesurfer.current.on("finish", () => {
-          if (wavesurfer.current) {
-            wavesurfer.current.seekTo(0);
-            if (currentAudio?.isLoop) {
-              wavesurfer.current.play();
-            } else {
-              handlePlaying(false);
-            }
-          }
-        });
       }
     }
 
     return () => destroyWavesurferIfDefined();
-  }, [currentAudio?.isLoop, audioUrl]);
+  }, [currentAudio?.id, audioUrl]);
+
+  useEffect(() => {
+    if (wavesurfer.current) {
+      wavesurfer.current.on("finish", () => {
+        if (wavesurfer.current) {
+          wavesurfer.current.seekTo(0);
+          if (loop) {
+            wavesurfer.current.play();
+            handlePlaying(true);
+          } else {
+            wavesurfer.current.stop();
+            handlePlaying(false);
+          }
+        }
+      });
+
+      return () => wavesurfer.current?.un("finish", () => {});
+    }
+  }, [loop]);
 
   useEffect(() => {
     if (wavesurfer.current) {
@@ -132,7 +144,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
   return (
     <Flex paddingY="0.2rem" paddingX="0.2rem" align="center">
-      <Flex padding="1rem" width="10%" align="center">
+      <Flex flexDirection="column" padding="1rem" width="10%" align="center">
         <Circle
           size="70px"
           bg={color}
@@ -142,6 +154,16 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
         >
           {playing ? <IoMdPause size="30px" /> : <IoMdPlay size="30px" />}
         </Circle>
+        <IconButton
+          isRound
+          variant="ghost"
+          icon={<IoMdRepeat />}
+          aria-label="Repeat"
+          size="md"
+          marginTop={2}
+          opacity={loop ? 1 : 0.7}
+          onClick={handleLoop}
+        />
       </Flex>
       <Box width="80%">
         <Box id="waveform" ref={wavesurferRef}></Box>
