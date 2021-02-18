@@ -46,6 +46,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   const waveColor = useColorModeValue("#1A202C", "#EDF2F7");
   const wavesurferRef = useRef<HTMLDivElement | null>(null);
   const wavesurfer = useRef<WaveSurfer | null>(null);
+  const playPromise = useRef<Promise<void> | undefined>(undefined);
 
   useEffect(() => {
     if (audio) {
@@ -59,15 +60,10 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     [currentAudio?.uploadId, currentAudio?.fileExt]
   );
 
-  const onPlayPause = useCallback(() => {
+  const onPlayPause = useCallback(async () => {
     if (wavesurfer.current) {
-      if (playing) {
-        wavesurfer.current.pause();
-        handlePlaying(false);
-      } else {
-        wavesurfer.current.play();
-        handlePlaying(true);
-      }
+      await wavesurfer.current.playPause();
+      handlePlaying(wavesurfer.current.isPlaying());
     }
   }, [playing, handlePlaying]);
 
@@ -112,18 +108,21 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   }, [currentAudio?.id, audioUrl]);
 
   useEffect(() => {
+    const handlingLoop = async () => {
+      if (wavesurfer.current) {
+        if (loop) {
+          wavesurfer.current.seekTo(0);
+          await wavesurfer.current.playPause();
+        } else {
+          wavesurfer.current.stop();
+          handlePlaying(false);
+        }
+      }
+    };
+
     if (wavesurfer.current) {
       wavesurfer.current.on("finish", () => {
-        if (wavesurfer.current) {
-          wavesurfer.current.seekTo(0);
-          if (loop) {
-            wavesurfer.current.play();
-            handlePlaying(true);
-          } else {
-            wavesurfer.current.stop();
-            handlePlaying(false);
-          }
-        }
+        handlingLoop();
       });
 
       return () => wavesurfer.current?.un("finish", () => {});

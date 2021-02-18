@@ -1,16 +1,19 @@
 import {
   Badge,
   Box,
+  BoxProps,
   Flex,
   Heading,
   Icon,
+  Image,
   LinkBox,
   LinkOverlay,
   Stack,
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
+import NextImage from "next/image";
 import NextLink from "next/link";
 import { MdLoop } from "react-icons/md";
 import Picture from "~/components/Shared/Picture";
@@ -22,16 +25,31 @@ interface AudioListItemProps {
   removeArtistName?: boolean;
 }
 
+interface AudioListItemPictureProps {
+  src: string;
+  imageSize: number;
+}
+
+const AudioListItemPicture: React.FC<AudioListItemPictureProps & BoxProps> = ({
+  src,
+  imageSize,
+}) => {
+  const pictureLink = useMemo(() => {
+    if (!src) return "";
+    return `https://audiochan.s3.amazonaws.com/${src}`;
+  }, [src]);
+
+  if (!pictureLink) {
+    return <Image src={pictureLink} height={imageSize} />;
+  }
+
+  return <NextImage src={pictureLink} width={imageSize} height={imageSize} />;
+};
+
 const AudioListItem: React.FC<AudioListItemProps> = ({
   audio,
   removeArtistName = false,
 }) => {
-  const picture = useMemo(() => {
-    return audio?.picture
-      ? `https://audiochan.s3.amazonaws.com/${audio.picture}`
-      : "";
-  }, [audio]);
-
   return (
     <LinkBox
       as="article"
@@ -42,9 +60,11 @@ const AudioListItem: React.FC<AudioListItemProps> = ({
       borderRadius="lg"
       overflow="hidden"
     >
-      <Box>
-        <Picture src={picture} size={125} borderRightWidth="1px" />
-      </Box>
+      <AudioListItemPicture
+        src={audio.picture}
+        imageSize={125}
+        borderRightWidth="1px"
+      />
       <Flex width="100%" paddingY={2} paddingX={4}>
         <Box flex="3">
           <Heading as="h3" size="md">
@@ -56,12 +76,8 @@ const AudioListItem: React.FC<AudioListItemProps> = ({
         </Box>
         <Flex flex="1" justify="flex-end">
           <Stack direction="column" spacing={1} textAlign="right">
-            <div>
-              <Badge>{audio.genre?.name}</Badge>
-            </div>
-            <div>
-              <Text fontSize="sm">{formatDuration(audio.duration)}</Text>
-            </div>
+            <Badge>{audio.genre?.name}</Badge>
+            <Text fontSize="sm">{formatDuration(audio.duration)}</Text>
             <div>
               {audio.isLoop && (
                 <Tooltip label="Loop" fontSize="sm">

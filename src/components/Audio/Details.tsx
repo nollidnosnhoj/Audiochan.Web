@@ -27,11 +27,11 @@ import { formatDuration, relativeDate } from "~/utils/time";
 import { successfulToast } from "~/utils/toast";
 import useUser from "~/lib/contexts/user_context";
 
-interface AudioMetaProps {
+interface AudioDetailProps {
   audio: Audio;
 }
 
-const AudioDetails: React.FC<AudioMetaProps> = ({ audio }) => {
+const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
   const { user: currentUser } = useUser();
 
   const {
