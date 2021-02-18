@@ -7,7 +7,11 @@ import React, {
   useState,
 } from "react";
 import { LoginFormValues } from "~/components/Auth/LoginForm";
-import { login, revokeRefreshToken } from "../services/auth";
+import {
+  login,
+  refreshAccessToken,
+  revokeRefreshToken,
+} from "../services/auth";
 import { CurrentUser } from "../types/user";
 import api from "~/utils/api";
 import { getAccessToken } from "~/utils/cookies";
@@ -29,10 +33,12 @@ interface UserProviderProps {
 
 export function UserProvider(props: PropsWithChildren<UserProviderProps>) {
   const [user, setUser] = useState<CurrentUser | undefined>(props.initialUser);
+  const [expires, setExpires] = useState(0);
   const [loadingUser, setLoadingUser] = useState(false);
 
   async function authenticate(inputs: LoginFormValues) {
-    await login(inputs);
+    const result = await login(inputs);
+    setExpirationToLocalStorage(result.accessTokenExpires);
     await fetchAuthenticatedUser();
   }
 
@@ -71,12 +77,40 @@ export function UserProvider(props: PropsWithChildren<UserProviderProps>) {
     });
   }
 
+  function setExpirationToLocalStorage(exp: number) {
+    setExpires(exp);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("expires", JSON.stringify(exp));
+    }
+  }
+
+  useEffect(() => {
+    const localExpires = window.localStorage.getItem("expires");
+    if (localExpires) {
+      const parsedInt = parseInt(localExpires);
+      setExpires(isNaN(parsedInt) ? 0 : parsedInt);
+    }
+  }, []);
+
   useEffect(() => {
     const accessToken = getAccessToken();
     if (!user && accessToken) {
       fetchAuthenticatedUser();
     }
   }, [user]);
+
+  useEffect(() => {
+    const handle = setInterval(async () => {
+      if (expires <= Date.now() / 1000) {
+        refreshAccessToken().then((result) => {
+          console.log(result);
+          setExpirationToLocalStorage(result.accessTokenExpires);
+        });
+      }
+    }, 1000 * 60);
+
+    return () => clearInterval(handle);
+  }, []);
 
   const values = useMemo<UserContextType>(
     () => ({
