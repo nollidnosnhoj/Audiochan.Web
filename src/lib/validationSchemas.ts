@@ -22,7 +22,7 @@ const {
 
 export const usernameRule = (label: string) => {
   let schema = string()
-    .test('allowedCharacters', "Username can only contain uppercase, lowercase, numbers, hyphens, or underscores.", (value) => {
+    .test('allowedCharacters', "Username can only contain lowercase, numbers, hyphens, or underscores.", (value) => {
       if (value) {
         for(const char of value) {
           if (usernameAllowedChars.indexOf(char) == -1) {

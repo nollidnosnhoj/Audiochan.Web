@@ -6,7 +6,7 @@ import TextInput from "~/components/Form/TextInput";
 import useUser from "~/lib/contexts/user_context";
 import { usernameRule } from "~/lib/validationSchemas";
 import api from "~/utils/api";
-import { apiErrorToast } from "~/utils/toast";
+import { apiErrorToast, successfulToast } from "~/utils/toast";
 
 export default function UpdateUsername() {
   const { user, updateUser } = useUser();
@@ -20,13 +20,17 @@ export default function UpdateUsername() {
       ),
     }),
     onSubmit: async (values, { setSubmitting }) => {
-      const { username } = values;
-      if (username.toLowerCase() === user?.username) return;
+      const { username: newUsername } = values;
+      if (newUsername.toLowerCase() === user?.username) return;
 
       try {
-        await api.patch("me/change-username", { username });
+        await api.patch("me/username", { newUsername });
+        successfulToast({
+          title: "Username updated.",
+          message: "You have successfully updated your username.",
+        });
         if (user) {
-          updateUser({ ...user, username: username });
+          updateUser({ ...user, username: newUsername });
         }
       } catch (err) {
         apiErrorToast(err);

@@ -16,7 +16,7 @@ import { isAxiosError } from "~/utils/axios";
 import { ErrorResponse } from "~/lib/types";
 
 export type LoginFormValues = {
-  username: string;
+  login: string;
   password: string;
 };
 
@@ -43,11 +43,11 @@ export default function LoginForm(props: LoginFormProps) {
       }
     },
     initialValues: {
-      username: "",
+      login: "",
       password: "",
     },
     validationSchema: yup.object().shape({
-      username: yup.string().required(),
+      login: yup.string().required(),
       password: yup.string().required(),
     }),
   });
@@ -69,10 +69,10 @@ export default function LoginForm(props: LoginFormProps) {
       )}
       <form onSubmit={handleSubmit}>
         <TextInput
-          name="username"
-          value={values.username}
+          name="login"
+          value={values.login}
           onChange={handleChange}
-          error={errors.username}
+          error={errors.login}
           label="Username/Email"
           required
         />
@@ -81,7 +81,7 @@ export default function LoginForm(props: LoginFormProps) {
           type="password"
           value={values.password}
           onChange={handleChange}
-          error={errors.username}
+          error={errors.login}
           label="Password"
           required
         />

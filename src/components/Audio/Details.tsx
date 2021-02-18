@@ -124,7 +124,7 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
           </HStack>
         </Stack>
         <Stack direction="row">
-          <Stack direction="column" spacing={2}>
+          <Stack direction="column" spacing={2} width="100%">
             <Flex as="header" alignItems="center">
               <Heading as="h1" fontSize="2xl">
                 {audio.title}
@@ -144,9 +144,6 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
             <Text fontSize="sm">{audio.description}</Text>
             {audio.tags && (
               <Box>
-                <Heading as="h2" fontSize="lg">
-                  Tags
-                </Heading>
                 <Wrap marginTop={2}>
                   {audio.tags.map((tag, idx) => (
                     <WrapItem key={idx}>
