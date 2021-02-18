@@ -34,7 +34,7 @@ function generateUseAudiosKey(options: useAudiosPaginatedOptions) {
   if (options.type === 'feed') {
     url = `me/feed`
   } else if (options.type === 'favorites' && options.username) {
-    url = `users/${options.username}/favorites`
+    url = `users/${options.username}/favorites/audios`
   } else if (options.type === 'user' && options.username) {
     url = `users/${options.username}/audios`
   }

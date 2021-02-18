@@ -6,7 +6,7 @@ import TextInput from "~/components/Form/TextInput";
 import useUser from "~/lib/contexts/user_context";
 import { validationMessages } from "~/utils";
 import api from "~/utils/api";
-import { apiErrorToast } from "~/utils/toast";
+import { apiErrorToast, successfulToast } from "~/utils/toast";
 
 export default function UpdateEmail() {
   const { user, updateUser } = useUser();
@@ -19,14 +19,18 @@ export default function UpdateEmail() {
         .required(validationMessages.required("Email"))
         .email("Email is invalid"),
     }),
-    onSubmit: async (values: { email: string }, { setSubmitting }) => {
-      const { email } = values;
-      if (email.trim() === user?.email) return;
+    onSubmit: async (values, { setSubmitting }) => {
+      const { email: newEmail } = values;
+      if (newEmail.trim() === user?.email) return;
 
       try {
-        await api.patch("me/change-email", { email });
+        await api.patch("me/email", { newEmail });
+        successfulToast({
+          title: "Email updated.",
+          message: "You have successfully updated your email.",
+        });
         if (user) {
-          updateUser({ ...user, email: email.trim() });
+          updateUser({ ...user, email: newEmail.trim() });
         }
       } catch (err) {
         apiErrorToast(err);

@@ -90,15 +90,17 @@ export default function ProfilePage() {
             </Text>
           </Box>
           <Flex justifyContent="center">
-            <Button
-              colorScheme="primary"
-              variant={isFollowing ? "solid" : "outline"}
-              disabled={isFollowing === undefined}
-              paddingX={12}
-              onClick={() => follow()}
-            >
-              {isFollowing ? "Followed" : "Follow"}
-            </Button>
+            {user && user.id !== profile.id && (
+              <Button
+                colorScheme="primary"
+                variant={isFollowing ? "solid" : "outline"}
+                disabled={isFollowing === undefined}
+                paddingX={12}
+                onClick={() => follow()}
+              >
+                {isFollowing ? "Followed" : "Follow"}
+              </Button>
+            )}
           </Flex>
         </Flex>
         <Box flex="3">
