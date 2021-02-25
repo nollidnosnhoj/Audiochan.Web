@@ -9,6 +9,7 @@ import {
   Stack,
   Tag,
   Text,
+  useColorModeValue,
   useDisclosure,
   VStack,
   Wrap,
@@ -32,6 +33,7 @@ interface AudioDetailProps {
 }
 
 const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
+  const secondaryColor = useColorModeValue("black.300", "gray.300");
   const { user: currentUser } = useUser();
 
   const {
@@ -95,7 +97,7 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
             <Link href={`/users/${audio.user.username}`}>
               <Text fontWeight="500">{audio.user.username}</Text>
             </Link>
-            <Text>{audioCreatedDateRelative}</Text>
+            <Text color={secondaryColor}>{audioCreatedDateRelative}</Text>
           </Stack>
           <Spacer />
           <HStack justifyContent="flex-end">
@@ -138,10 +140,12 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
                     </Badge>
                   )}
                 </Box>
-                <Box>{audioDurationFormatted}</Box>
+                <Box color={secondaryColor}>{audioDurationFormatted}</Box>
               </VStack>
             </Flex>
-            <Text fontSize="sm">{audio.description}</Text>
+            <Text fontSize="sm" color={secondaryColor}>
+              {audio.description || "No information given."}
+            </Text>
             {audio.tags && (
               <Box>
                 <Wrap marginTop={2}>

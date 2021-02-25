@@ -31,6 +31,7 @@ import VolumeSliderHeader from "./VolumeSliderHeader";
 import useUser from "~/lib/contexts/user_context";
 import AuthButton from "../Auth/AuthButton";
 import Container from "../Shared/Container";
+import Link from "../Shared/Link";
 
 interface HeaderNavLinkProps {
   href: string;
@@ -134,7 +135,14 @@ const Header: React.FC<HeaderProps> = (props) => {
             />
             <HStack as="nav" spacing={4} display={{ base: "none", md: "flex" }}>
               <Heading display={{ base: "none", md: "flex" }}>
-                Audiochan
+                <Link
+                  href="/"
+                  _hover={{
+                    textDecoration: "none",
+                  }}
+                >
+                  Audiochan
+                </Link>
               </Heading>
               {HeaderNavLinks}
             </HStack>

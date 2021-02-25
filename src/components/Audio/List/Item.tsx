@@ -66,14 +66,16 @@ const AudioListItem: React.FC<AudioListItemProps> = ({
         borderRightWidth="1px"
       />
       <Flex width="100%" paddingY={2} paddingX={4}>
-        <Box flex="3">
-          <Heading as="h3" size="md">
-            <NextLink href={`/audios/${audio.id}`} passHref>
-              <LinkOverlay href={``}>{audio.title}</LinkOverlay>
-            </NextLink>
-          </Heading>
-          {!removeArtistName && <Text as="i">{audio.user.username}</Text>}
-        </Box>
+        <Flex flex="3" alignItems="center">
+          <Box>
+            <Heading as="h3" size="lg">
+              <NextLink href={`/audios/${audio.id}`} passHref>
+                <LinkOverlay href={``}>{audio.title}</LinkOverlay>
+              </NextLink>
+            </Heading>
+            {!removeArtistName && <Text as="i">{audio.user.username}</Text>}
+          </Box>
+        </Flex>
         <Flex flex="1" justify="flex-end">
           <Stack direction="column" spacing={1} textAlign="right">
             <Badge>{audio.genre?.name}</Badge>
