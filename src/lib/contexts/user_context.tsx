@@ -55,26 +55,22 @@ export function UserProvider(props: PropsWithChildren<UserProviderProps>) {
           setUser(data);
           resolve(data);
         })
-        .catch((err) => {
-          deauthenticate().then(() => reject(err));
+        .catch(() => {
+          deauthenticate();
         })
         .finally(() => setLoadingUser(() => false));
     });
   };
 
-  function deauthenticate(logoutMessage?: string) {
-    return new Promise<boolean>((resolve, reject) => {
-      revokeRefreshToken()
-        .then(() => {
-          updateUser(undefined);
-          successfulToast({
-            title: "You have logged out.",
-            message: logoutMessage,
-          });
-          resolve(true);
-        })
-        .catch((err) => reject(err));
-    });
+  async function deauthenticate(logoutMessage?: string) {
+    try {
+      await revokeRefreshToken();
+      updateUser(undefined);
+      successfulToast({
+        title: "You have logged out.",
+        message: logoutMessage,
+      });
+    } catch (err) {}
   }
 
   function setExpirationToLocalStorage(exp: number) {

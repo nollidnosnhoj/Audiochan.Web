@@ -18,6 +18,7 @@ export async function refreshAccessToken() {
 
 export async function revokeRefreshToken() {
   return await Axios.post('/api/auth/revoke', undefined, {
-    withCredentials: true
+    withCredentials: true,
+    validateStatus: (status) => status < 500
   });
 }
