@@ -110,12 +110,12 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   useEffect(() => {
     const handlingLoop = async () => {
       if (wavesurfer.current) {
+        handlePlaying(loop);
         if (loop) {
+          await wavesurfer.current.play();
           wavesurfer.current.seekTo(0);
-          await wavesurfer.current.playPause();
         } else {
           wavesurfer.current.stop();
-          handlePlaying(false);
         }
       }
     };
