@@ -29,7 +29,7 @@ import {
 import { Audio } from "~/features/audio/types";
 import { formatDuration, relativeDate } from "~/utils/time";
 import { successfulToast } from "~/utils/toast";
-import useUser from "~/contexts/user_context";
+import useUser from "~/contexts/userContext";
 
 interface AudioDetailProps {
   audio: Audio;

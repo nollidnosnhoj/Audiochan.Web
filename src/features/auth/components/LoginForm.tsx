@@ -10,7 +10,7 @@ import {
 import { useFormik } from "formik";
 import * as yup from "yup";
 import TextInput from "../../../components/Form/TextInput";
-import useUser from "~/contexts/user_context";
+import useUser from "~/contexts/userContext";
 import { apiErrorToast, successfulToast } from "~/utils/toast";
 import { isAxiosError } from "~/utils/axios";
 import { ErrorResponse } from "~/lib/types";

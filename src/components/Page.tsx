@@ -4,7 +4,7 @@ import Router, { useRouter } from "next/router";
 import React, { useEffect, useMemo } from "react";
 import Container from "~/components/Container";
 import Header from "~/components/Header";
-import useUser from "~/contexts/user_context";
+import useUser from "~/contexts/userContext";
 
 interface PageProps {
   title?: string;

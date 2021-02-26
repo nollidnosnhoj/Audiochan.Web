@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useMemo, useRef } from "react";
 import { FaVolumeDown, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
-import { useAudioPlayer } from "~/contexts/audio_player_context";
+import { useAudioPlayer } from "~/contexts/audioPlayerContext";
 
 export default function VolumeSliderButton() {
   const { volume, handleVolume } = useAudioPlayer();

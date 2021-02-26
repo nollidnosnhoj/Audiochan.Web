@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQueryClient, useMutation } from "react-query";
-import useUser from "~/contexts/user_context";
+import useUser from "~/contexts/userContext";
 import api from "~/utils/api";
 import { apiErrorToast } from "~/utils/toast";
 

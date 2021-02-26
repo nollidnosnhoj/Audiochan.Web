@@ -29,7 +29,7 @@ import { FaCloudUploadAlt, FaUserAlt } from "react-icons/fa";
 import NextLink from "next/link";
 import Link from "./Link";
 import VolumeSliderButton from "./VolumeSliderButton";
-import useUser from "~/contexts/user_context";
+import useUser from "~/contexts/userContext";
 import Container from "./Container";
 import AuthButton from "~/features/auth/components/AuthButton";
 

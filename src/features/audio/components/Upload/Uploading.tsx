@@ -6,7 +6,7 @@ import {
   addAudioPicture,
   useCreateAudio,
 } from "~/features/audio/hooks/mutations";
-import useUser from "~/contexts/user_context";
+import useUser from "~/contexts/userContext";
 import { AudioRequest, CreateAudioRequest } from "~/features/audio/types";
 import api from "~/utils/api";
 import { successfulToast } from "~/utils/toast";

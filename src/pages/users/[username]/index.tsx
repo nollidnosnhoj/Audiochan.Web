@@ -17,7 +17,7 @@ import { dehydrate } from "react-query/hydration";
 import Page from "~/components/Page";
 import Picture from "~/components/Picture";
 import { useProfile } from "~/features/user/hooks/queries";
-import useUser from "~/contexts/user_context";
+import useUser from "~/contexts/userContext";
 import { getAccessToken } from "~/utils/cookies";
 import UserAudioList from "~/features/user/components/UserAudioList";
 import UserFavoriteAudioList from "~/features/user/components/UserFavoriteAudioList";

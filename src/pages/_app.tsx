@@ -4,9 +4,9 @@ import { QueryClientProvider, QueryClient } from "react-query";
 import { Hydrate } from "react-query/hydration";
 import { ReactQueryDevtools } from "react-query/devtools";
 import PageLoader from "~/components/PageLoader";
-import { UserProvider } from "~/contexts/user_context";
+import { UserProvider } from "~/contexts/userContext";
 import theme from "~/lib/theme";
-import { AudioPlayerProvider } from "~/contexts/audio_player_context";
+import { AudioPlayerProvider } from "~/contexts/audioPlayerContext";
 import { CurrentUser } from "~/features/user/types";
 
 interface AppProps extends NextAppProps {

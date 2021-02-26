@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { IoMdPlay, IoMdPause, IoMdRepeat } from "react-icons/io";
 import WaveSurfer from "wavesurfer.js";
-import { useAudioPlayer } from "~/contexts/audio_player_context";
+import { useAudioPlayer } from "~/contexts/audioPlayerContext";
 import { formatDuration } from "~/utils/time";
 import { Audio } from "~/features/audio/types";
 import { createWavesurfer } from "~/utils/wavesurfer";
