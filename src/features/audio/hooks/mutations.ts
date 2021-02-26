@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query'
 import api from '~/utils/api';
 import { apiErrorToast, successfulToast } from '~/utils/toast';
+import { addAudioPicture } from '../services/addAudioPicture';
 import { Audio, CreateAudioRequest } from '../types'
 
 export const useAudioFavorite = (audioId: number, initialData?: boolean) => {
@@ -79,9 +80,6 @@ export const useRemoveAudio = (id: number) => {
     }
   })
 }
-
-export const addAudioPicture = async (id: number, data: string) =>
-  await api.patch<{ image: string }>(`audios/${id}/picture`, { data });
 
 export const useAddAudioPicture = (id: number) => {
   const queryClient = useQueryClient();

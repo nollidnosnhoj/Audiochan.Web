@@ -2,16 +2,14 @@ import axios from "axios";
 import { Box, Flex, Heading, Progress, Stack, Text } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useState } from "react";
 import Router from "next/router";
-import {
-  addAudioPicture,
-  useCreateAudio,
-} from "~/features/audio/hooks/mutations";
+import { useCreateAudio } from "~/features/audio/hooks/mutations";
 import useUser from "~/contexts/userContext";
 import { AudioRequest, CreateAudioRequest } from "~/features/audio/types";
 import api from "~/utils/api";
 import { successfulToast } from "~/utils/toast";
 import { isAxiosError } from "~/utils/axios";
 import { ErrorResponse } from "~/lib/types";
+import { addAudioPicture } from "../../services/addAudioPicture";
 
 interface AudioUploadingProps {
   file: File;
