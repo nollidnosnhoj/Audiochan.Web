@@ -14,19 +14,15 @@ import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { QueryClient } from "react-query";
 import { dehydrate } from "react-query/hydration";
-import Page from "~/components/Shared/Page";
-import Picture from "~/components/Shared/Picture";
-import PictureDropzone from "~/components/Shared/Picture/PictureDropzone";
-import AudioList from "~/components/Audio/List";
-import {
-  fetchUserProfile,
-  useAddUserPicture,
-  useFollow,
-  useProfile,
-} from "~/lib/services/users";
-import useUser from "~/lib/contexts/user_context";
+import Page from "~/components/Page";
+import Picture from "~/components/Picture";
+import { useProfile } from "~/features/user/hooks/queries";
+import useUser from "~/contexts/user_context";
 import { getAccessToken } from "~/utils/cookies";
-import { successfulToast } from "~/utils/toast";
+import UserAudioList from "~/features/user/components/UserAudioList";
+import UserFavoriteAudioList from "~/features/user/components/UserFavoriteAudioList";
+import { useAddUserPicture, useFollow } from "~/features/user/hooks/mutations";
+import { fetchUserProfile } from "~/features/user/services/fetch";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const queryClient = new QueryClient();
@@ -111,14 +107,10 @@ export default function ProfilePage() {
             </TabList>
             <TabPanels>
               <TabPanel>
-                <AudioList
-                  type="user"
-                  username={profile!.username}
-                  removeArtistName
-                />
+                <UserAudioList username={profile.username} />
               </TabPanel>
               <TabPanel>
-                <AudioList type="favorites" username={profile!.username} />
+                <UserFavoriteAudioList username={profile.username} />
               </TabPanel>
             </TabPanels>
           </Tabs>

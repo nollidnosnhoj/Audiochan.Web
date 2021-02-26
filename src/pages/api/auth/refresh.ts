@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { BackendAuthResult } from './login';
 import api from '~/utils/api';
 import { isAxiosError } from '~/utils/axios';
 import { getRefreshToken, setAccessTokenCookie, setRefreshTokenCookie } from '~/utils/cookies'

@@ -3,11 +3,11 @@ import { AppProps as NextAppProps } from "next/app";
 import { QueryClientProvider, QueryClient } from "react-query";
 import { Hydrate } from "react-query/hydration";
 import { ReactQueryDevtools } from "react-query/devtools";
-import PageLoader from "~/components/Shared/PageLoader";
-import { UserProvider } from "~/lib/contexts/user_context";
+import PageLoader from "~/components/PageLoader";
+import { UserProvider } from "~/contexts/user_context";
 import theme from "~/lib/theme";
-import { AudioPlayerProvider } from "~/lib/contexts/audio_player_context";
-import { CurrentUser } from "~/lib/types/user";
+import { AudioPlayerProvider } from "~/contexts/audio_player_context";
+import { CurrentUser } from "~/features/user/types";
 
 interface AppProps extends NextAppProps {
   user?: CurrentUser;

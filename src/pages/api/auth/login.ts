@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { AuthResult } from '~/lib/types';
+import { AuthResult } from '~/features/auth/types';
 import api from '~/utils/api';
 import { isAxiosError } from '~/utils/axios';
 import { setAccessTokenCookie, setRefreshTokenCookie } from '~/utils/cookies'

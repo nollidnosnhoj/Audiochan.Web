@@ -1,7 +1,7 @@
 import React from "react";
 import { NextPage } from "next";
 import { Flex, Heading, Text } from "@chakra-ui/react";
-import Page from "~/components/Shared/Page";
+import Page from "~/components/Page";
 
 const NotFoundPage: NextPage = () => {
   return (

@@ -1,33 +1,23 @@
 import React from "react";
-import {
-  Box,
-  Flex,
-  useDisclosure,
-  Button,
-  Stack,
-  VStack,
-  Wrap,
-  WrapItem,
-  Tag,
-  Heading,
-} from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { QueryClient } from "react-query";
 import { dehydrate } from "react-query/hydration";
-import AudioDetails from "~/components/Audio/Details";
-import Container from "~/components/Shared/Container";
-import Page from "~/components/Shared/Page";
-import AudioEdit from "~/components/Audio/Edit";
-import useUser from "~/lib/contexts/user_context";
-import { fetchAudioById, useAudio } from "~/lib/services/audio";
+import AudioDetails from "~/features/audio/components/Details";
+import Container from "~/components/Container";
+import Page from "~/components/Page";
 import { getAccessToken } from "~/utils/cookies";
-import AudioFeedbacks from "~/components/Audio/Feedbacks";
+import { useAudio } from "~/features/audio/hooks/queries";
+import { fetchAudioById } from "~/features/audio/services/fetch";
 
-const DynamicAudioPlayer = dynamic(() => import("~/components/Audio/Player"), {
-  ssr: false,
-});
+const DynamicAudioPlayer = dynamic(
+  () => import("~/features/audio/components/Player"),
+  {
+    ssr: false,
+  }
+);
 
 // Fetch the audio detail and render it onto the server.
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -74,9 +64,6 @@ export default function AudioDetailsPage(
     >
       <Box>
         <AudioDetails audio={audio} />
-        <Flex>
-          <AudioFeedbacks audioId={audio.id} flex="3" />
-        </Flex>
       </Box>
     </Page>
   );

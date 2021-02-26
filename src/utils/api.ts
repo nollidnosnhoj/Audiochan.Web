@@ -1,7 +1,7 @@
 import axios, { Method } from 'axios'
 import createAuthRefreshInterceptor, { AxiosAuthRefreshRequestConfig } from 'axios-auth-refresh';
 import config from '~/lib/config';
-import { refreshAccessToken } from '~/lib/services/auth';
+import { refreshAccessToken } from '~/features/auth/services';
 import { isAxiosError } from './axios';
 import { getAccessToken } from './cookies';
 

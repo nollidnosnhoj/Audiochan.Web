@@ -1,9 +1,9 @@
 import React from "react";
 import { Box, Heading, Stack } from "@chakra-ui/react";
-import UpdateUsername from "~/components/User/UpdateUsername";
-import UpdateEmail from "~/components/User/UpdateEmail";
-import UpdatePassword from "~/components/User/UpdatePassword";
-import Page from "~/components/Shared/Page";
+import UpdateUsername from "~/features/user/components/UpdateUsername";
+import UpdateEmail from "~/features/user/components/UpdateEmail";
+import UpdatePassword from "~/features/user/components/UpdatePassword";
+import Page from "~/components/Page";
 
 export default function SettingPage() {
   return (

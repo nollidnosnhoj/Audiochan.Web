@@ -5,7 +5,7 @@ import {
   Select,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { Genre } from "~/lib/types/genre";
+import { Genre } from "~/lib/types";
 import api from "~/utils/api";
 
 interface GenreSelectProps {
