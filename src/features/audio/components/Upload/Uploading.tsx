@@ -1,5 +1,13 @@
 import axios from "axios";
-import { Box, Flex, Heading, Progress, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Heading,
+  Progress,
+  Stack,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import React, { useCallback, useEffect, useState } from "react";
 import Router from "next/router";
 import { useCreateAudio } from "~/features/audio/hooks/mutations";
@@ -31,6 +39,7 @@ const STAGE_MESSAGES = [
 
 export default function AudioUploading(props: AudioUploadingProps) {
   const { file, form, picture } = props;
+  const toast = useToast();
   const { user } = useUser();
   const [stage, setStage] = useState(0);
   const [uploadAudioProgress, setUploadAudioProgress] = useState(0);
@@ -160,9 +169,18 @@ export default function AudioUploading(props: AudioUploadingProps) {
   // When the audio is created, upload the picture if applicable
   useEffect(() => {
     if (audioId > 0 && picture) {
-      addPictureAfterAudioCreation().finally(() => {
-        setCompleted(true);
-      });
+      addPictureAfterAudioCreation()
+        .catch(() => {
+          toast({
+            title: "Unable to upload picture.",
+            description: "Try again later.",
+            status: "warning",
+            duration: 1000,
+          });
+        })
+        .finally(() => {
+          setCompleted(true);
+        });
     } else if (audioId > 0) {
       setCompleted(true);
     }
@@ -171,7 +189,7 @@ export default function AudioUploading(props: AudioUploadingProps) {
   // Once completed, push the route to the newly created audio
   useEffect(() => {
     if (completed && audioId > 0) {
-      Router.push(`audios/${audioId}`).then(() => {
+      Router.push(`audios/view/${audioId}`).then(() => {
         successfulToast({
           title: "Audio uploaded",
           message: "You have successfully uploaded your audio.",

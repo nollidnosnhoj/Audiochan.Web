@@ -21,7 +21,6 @@ export function errorToast(options: {
 }
 
 export function apiErrorToast(err: any) {
-  console.log(err);
   let message = "An error has occured while processing request. Please try again later."
   let title = "API Error Occurred."
   if (isAxiosError<ErrorResponse>(err)) {

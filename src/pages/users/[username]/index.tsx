@@ -23,6 +23,9 @@ import UserAudioList from "~/features/user/components/UserAudioList";
 import UserFavoriteAudioList from "~/features/user/components/UserFavoriteAudioList";
 import { useAddUserPicture, useFollow } from "~/features/user/hooks/mutations";
 import { fetchUserProfile } from "~/features/user/services/fetch";
+import { isAxiosError } from "~/utils/axios";
+import { ErrorResponse } from "~/lib/types";
+import { errorToast } from "~/utils/toast";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const queryClient = new QueryClient();
@@ -74,9 +77,21 @@ export default function ProfilePage() {
               disabled={isAdddingPicture}
               canReplace={user?.id === profile.id}
               onReplace={(data) => {
-                addPictureAsync(data).then(({ data: { image } }) => {
-                  setPicture(image);
-                });
+                addPictureAsync(data)
+                  .then(({ data: { image } }) => {
+                    setPicture(image);
+                  })
+                  .catch((err) => {
+                    if (
+                      isAxiosError<ErrorResponse>(err) &&
+                      err.response?.status === 429
+                    ) {
+                      errorToast({
+                        title: "Too many requests.",
+                        message: "Try again later.",
+                      });
+                    }
+                  });
               }}
             />
           </Box>

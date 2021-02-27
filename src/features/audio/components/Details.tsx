@@ -28,8 +28,10 @@ import {
 } from "~/features/audio/hooks/mutations";
 import { Audio } from "~/features/audio/types";
 import { formatDuration, relativeDate } from "~/utils/time";
-import { successfulToast } from "~/utils/toast";
+import { errorToast, successfulToast } from "~/utils/toast";
 import useUser from "~/contexts/userContext";
+import { ErrorResponse } from "~/lib/types";
+import { isAxiosError } from "~/utils/axios";
 
 interface AudioDetailProps {
   audio: Audio;
@@ -84,13 +86,25 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
           disabled={isAddingArtwork}
           canReplace={currentUser?.id === audio.user.id}
           onReplace={(data) => {
-            uploadArtwork(data).then(({ data }) => {
-              setPicture(data.image);
-              successfulToast({
-                title: "Image successfully uploaded.",
-                message: "Image may take a couple minutes to update.",
+            uploadArtwork(data)
+              .then(({ data }) => {
+                setPicture(data.image);
+                successfulToast({
+                  title: "Image successfully uploaded.",
+                  message: "Image may take a couple minutes to update.",
+                });
+              })
+              .catch((err) => {
+                if (
+                  isAxiosError<ErrorResponse>(err) &&
+                  err.response?.status === 429
+                ) {
+                  errorToast({
+                    title: "Too many requests.",
+                    message: "Try again later.",
+                  });
+                }
               });
-            });
           }}
         />
       </Box>
