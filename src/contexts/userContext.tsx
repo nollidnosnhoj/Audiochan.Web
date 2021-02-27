@@ -16,6 +16,7 @@ import { CurrentUser } from "../features/user/types";
 import api from "~/utils/api";
 import { getAccessToken } from "~/utils/cookies";
 import { successfulToast } from "~/utils/toast";
+import { useInterval } from "@chakra-ui/react";
 
 type UserContextType = {
   user?: CurrentUser;
@@ -77,9 +78,9 @@ export function UserProvider(props: PropsWithChildren<UserProviderProps>) {
   }
 
   function setExpirationToLocalStorage(exp: number) {
-    setExpires(exp);
+    setExpires(() => exp);
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("expires", JSON.stringify(exp));
+      window.localStorage.setItem("expires", exp.toString());
     }
   }
 
@@ -98,18 +99,14 @@ export function UserProvider(props: PropsWithChildren<UserProviderProps>) {
     }
   }, [user]);
 
-  useEffect(() => {
-    const handle = setInterval(async () => {
-      if (expires <= Date.now() / 1000) {
-        refreshAccessToken().then((result) => {
-          console.log(result);
-          setExpirationToLocalStorage(result.accessTokenExpires);
-        });
-      }
-    }, 1000 * 60);
-
-    return () => clearInterval(handle);
-  }, []);
+  useInterval(() => {
+    const now = Date.now() / 1000;
+    if (expires <= now) {
+      refreshAccessToken().then((result) => {
+        setExpirationToLocalStorage(result.accessTokenExpires);
+      });
+    }
+  }, 1000 * 60);
 
   const values = useMemo<UserContextType>(
     () => ({
