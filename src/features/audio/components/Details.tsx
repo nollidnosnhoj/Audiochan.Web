@@ -9,6 +9,7 @@ import {
   Stack,
   Tag,
   Text,
+  Tooltip,
   useColorModeValue,
   useDisclosure,
   VStack,
@@ -119,16 +120,20 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
           <Spacer />
           <HStack justifyContent="flex-end">
             {currentUser && currentUser.id !== audio.user.id && (
-              <IconButton
-                isRound
-                colorScheme="pink"
-                variant="ghost"
-                size="lg"
-                icon={isFavorite ? <AiOutlineHeart /> : <AiFillHeart />}
-                aria-label={isFavorite ? "Unfavorite" : "Favorite"}
-                onClick={favorite}
-                isLoading={isFavoriteLoading}
-              />
+              <Tooltip label={isFavorite ? "Unfavorite" : "Favorite"}>
+                <span>
+                  <IconButton
+                    isRound
+                    colorScheme="pink"
+                    variant="ghost"
+                    size="lg"
+                    icon={isFavorite ? <AiFillHeart /> : <AiOutlineHeart />}
+                    aria-label={isFavorite ? "Unfavorite" : "Favorite"}
+                    onClick={favorite}
+                    isLoading={isFavoriteLoading}
+                  />
+                </span>
+              </Tooltip>
             )}
             {audio.user.id === currentUser?.id && (
               <IconButton

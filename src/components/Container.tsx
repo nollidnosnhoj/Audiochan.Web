@@ -6,7 +6,7 @@ const Container: React.FC<BoxProps> = (props) => {
     <Box
       w="full"
       mx="auto"
-      maxW="1200px"
+      maxW="1500px"
       px={{ base: "2", md: "6" }}
       {...props}
     >

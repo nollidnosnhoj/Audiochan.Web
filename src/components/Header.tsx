@@ -1,10 +1,4 @@
-import {
-  CloseIcon,
-  HamburgerIcon,
-  MoonIcon,
-  SearchIcon,
-  SunIcon,
-} from "@chakra-ui/icons";
+import { CloseIcon, HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -26,6 +20,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { FaCloudUploadAlt, FaUserAlt } from "react-icons/fa";
+import { MdLibraryMusic } from "react-icons/md";
 import NextLink from "next/link";
 import Link from "./Link";
 import VolumeSliderButton from "./VolumeSliderButton";
@@ -45,7 +40,7 @@ const HeaderNavLink: React.FC<HeaderNavLinkProps> = ({
   children,
 }) => (
   <NextLink href={href}>
-    <Button variant="ghost" colorScheme={color} size="sm" leftIcon={icon}>
+    <Button variant="ghost" colorScheme={color} size="md" leftIcon={icon}>
       {children}
     </Button>
   </NextLink>
@@ -61,8 +56,8 @@ const Header: React.FC<HeaderProps> = (props) => {
 
   const HeaderNavLinks = (
     <React.Fragment>
-      <HeaderNavLink href="#" icon={<SearchIcon />}>
-        Search
+      <HeaderNavLink href="/audios" icon={<MdLibraryMusic />}>
+        Browse
       </HeaderNavLink>
       {user && (
         <HeaderNavLink
@@ -139,7 +134,7 @@ const Header: React.FC<HeaderProps> = (props) => {
               display={{ md: !isOpen ? "none" : "inherit" }}
               onClick={isOpen ? onClose : onOpen}
             />
-            <HStack as="nav" spacing={4} display={{ base: "none", md: "flex" }}>
+            <HStack as="nav" spacing={8} display={{ base: "none", md: "flex" }}>
               <Heading display={{ base: "none", md: "flex" }}>
                 <Link
                   href="/"

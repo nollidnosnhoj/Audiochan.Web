@@ -21,12 +21,11 @@ export default function LoginPage() {
 
   if (isLoggedIn) {
     onRedirect();
-    return;
   }
 
   return (
     <Page title="Login">
-      <Flex justify="center" align="center" height="50vh">
+      <Flex justify="center" marginTop={50}>
         <Box width="550px">
           <LoginForm onSuccess={onRedirect} />
         </Box>

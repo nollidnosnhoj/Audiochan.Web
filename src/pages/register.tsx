@@ -17,12 +17,11 @@ export default function LoginPage() {
 
   if (isLoggedIn) {
     router.push(redirect);
-    return;
   }
 
   return (
-    <Page title="Login">
-      <Flex justify="center" align="center" height="50vh">
+    <Page title="Register">
+      <Flex justify="center" marginTop={50}>
         <Box width="550px">
           <RegisterForm onSuccess={() => router.push("/login")} />
         </Box>
