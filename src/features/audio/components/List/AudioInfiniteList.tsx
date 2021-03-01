@@ -1,20 +1,31 @@
 import { Box, Button } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { PagedList } from "~/lib/types";
 import { useAudiosInfinite } from "../../hooks/queries";
+import { Audio } from "../../types";
 import AudioListItem from "./Item";
 
 interface AudioListProps {
-  queryKey: string;
+  initialData?: PagedList<Audio>;
+  queryKey?: string;
   queryParams?: Record<string, any>;
   size?: number;
 }
 
-let hasMounted = false;
-
-export default function AudioList(props: AudioListProps) {
-  const { queryKey, queryParams = {}, size = 15 } = props;
+export default function AudioInfiniteList(props: AudioListProps) {
+  const {
+    initialData,
+    queryKey = "audios",
+    queryParams = {},
+    size = 15,
+  } = props;
   const [key, setKey] = useState(queryKey);
   const [params, setParams] = useState(queryParams);
+  const hasMounted = useRef(false);
+
+  useEffect(() => {
+    hasMounted.current = true;
+  }, []);
 
   useEffect(() => {
     setKey(queryKey);
@@ -24,16 +35,21 @@ export default function AudioList(props: AudioListProps) {
     setParams(queryParams);
   }, [queryParams]);
 
-  useEffect(() => {
-    if (!hasMounted) hasMounted = true;
-  }, []);
-
   const {
     items: audios,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useAudiosInfinite(key, params, size);
+  } = useAudiosInfinite(key || "audios", params, size, {
+    initialData: () => {
+      if (hasMounted.current) return undefined;
+      if (!initialData) return undefined;
+      return {
+        pages: [initialData],
+        pageParams: [1],
+      };
+    },
+  });
 
   return (
     <Box>
