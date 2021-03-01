@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import React from "react";
-import { useUserFavoriteAudiosInfiniteQuery } from "~/features/audio/hooks/queries";
+import { useAudiosInfinite } from "~/features/audio/hooks/queries";
 import AudioListItem from "../../audio/components/List/Item";
 
 interface UserFavoriteAudioListProps {
@@ -16,7 +16,7 @@ export default function UserFavoriteAudioList(
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useUserFavoriteAudiosInfiniteQuery(username, params);
+  } = useAudiosInfinite(`users/${username}/favorites/audios`, params, 15);
 
   return (
     <React.Fragment>

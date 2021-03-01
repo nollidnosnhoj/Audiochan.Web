@@ -1,10 +1,10 @@
 import { Box } from "@chakra-ui/react";
 import Head from "next/head";
-import Router, { useRouter } from "next/router";
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import Container from "~/components/Container";
 import Header from "~/components/Header";
 import useUser from "~/contexts/userContext";
+import LoginForm from "~/features/auth/components/LoginForm";
 
 interface PageProps {
   title?: string;
@@ -21,22 +21,17 @@ const Page: React.FC<PageProps> = ({
   children,
   ...props
 }) => {
-  const { user } = useUser();
-  const { asPath } = useRouter();
-
-  const loginUrl = useMemo<string>(() => {
-    return `/login?redirect=${decodeURIComponent(asPath)}`;
-  }, [asPath]);
+  const { user, isLoading } = useUser();
 
   const notAuthorized = useMemo<boolean>(() => {
     return !user && loginRequired;
   }, [user, loginRequired]);
 
-  useEffect(() => {
-    if (notAuthorized) {
-      Router.push(loginUrl);
-    }
-  }, [user, asPath, loginRequired]);
+  const content = useMemo(() => {
+    if (isLoading && notAuthorized) return null;
+    if (notAuthorized) return <LoginForm />;
+    return children;
+  }, [isLoading, notAuthorized]);
 
   return (
     <>
@@ -47,10 +42,8 @@ const Page: React.FC<PageProps> = ({
         {useHeader && <Header />}
         {beforeContainer}
       </Box>
-      <Container pb="3" pt="3" {...props}>
-        <Box paddingX="5" paddingY="1.5rem">
-          {!notAuthorized && children}
-        </Box>
+      <Container pb="3" pt="3" px="5" {...props}>
+        {content}
       </Container>
     </>
   );

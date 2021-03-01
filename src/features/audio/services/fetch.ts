@@ -1,11 +1,7 @@
-import api from '~/utils/api';
+import api, { FetchAudioOptions } from '~/utils/api';
 import { Audio } from '~/features/audio/types';
 
-interface FetchAudioByIdOptions {
-  accessToken?: string;
-}
-
-export const fetchAudioById = async (id: string, options: FetchAudioByIdOptions = {}) => {
+export const fetchAudioById = async (id: string, options: FetchAudioOptions = {}) => {
   const { data } = await api.get<Audio>(`audios/${id}`, { 
     accessToken: options.accessToken
   });

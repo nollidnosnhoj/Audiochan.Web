@@ -69,7 +69,7 @@ const AudioListItem: React.FC<AudioListItemProps> = ({
         <Flex flex="3" alignItems="center">
           <Box>
             <Heading as="h3" size="lg">
-              <NextLink href={`/audios/${audio.id}`} passHref>
+              <NextLink href={`/audios/view/${audio.id}`} passHref>
                 <LinkOverlay href={``}>{audio.title}</LinkOverlay>
               </NextLink>
             </Heading>

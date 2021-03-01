@@ -1,8 +1,13 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "react-query";
+import { useQuery, UseQueryOptions } from "react-query";
 import { ErrorResponse, PagedList } from "../lib/types";
 
-export default function usePagination<TItem>(key: string, fetcher: (page: number) => Promise<PagedList<TItem>>, params?: Record<string, any>) {
+export default function usePagination<TItem>(
+  key: string,
+  fetcher: (page: number) => Promise<PagedList<TItem>>,
+  params?: Record<string, any>,
+  options?: UseQueryOptions<PagedList<TItem>>
+) {
   const [page, setPage] = useState(1);
   const {
     data,
@@ -12,7 +17,8 @@ export default function usePagination<TItem>(key: string, fetcher: (page: number
     isFetching,
     isPreviousData
   } = useQuery<PagedList<TItem>, ErrorResponse>([key, { ...params, page }], () => fetcher(page), {
-    keepPreviousData: true
+    keepPreviousData: true,
+    ...options
   });
 
   const items = useMemo<TItem[]>(() => {

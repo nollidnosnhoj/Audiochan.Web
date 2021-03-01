@@ -1,38 +1,21 @@
-import { useQuery } from 'react-query';
-import queryString from 'query-string';
-import { UseQueryOptions } from 'react-query';
+import { UseInfiniteQueryOptions, useQuery, UseQueryOptions } from 'react-query';
 import useInfinitePagination from "~/hooks/useInfinitePagination";
 import usePagination from "~/hooks/usePagination";
 import { ErrorResponse, PagedList } from "~/lib/types";
 import { Audio } from '~/features/audio/types';
-import { fetch } from '~/utils/api'
 import { fetchAudioById } from '../services/fetch';
-
-const _fetchAudios = async (page: number = 1, key: string, params: Record<string, any>) => {
-  const qs = `?page=${page}&${queryString.stringify(params)}`
-  return await fetch<PagedList<Audio>>(key + qs);
-}
-
-const _useAudiosInfiniteQuery = (key: string, params: Record<string, any>) => {
-  return useInfinitePagination<Audio>(key, (page) => _fetchAudios(page, key, params), params);
-}
-
-const _useAudiosPaginatedQuery = (key: string, params: Record<string, any>) => {
-  return usePagination<Audio>(key, (page) => _fetchAudios(page, key, params), params);
-}
+import { fetchPages } from '~/utils/api';
 
 export const useAudio = (id: string, options: UseQueryOptions<Audio, ErrorResponse> = {}) => {
   return useQuery<Audio, ErrorResponse>(['audios', id], () => fetchAudioById(id), options);
 }
 
-export const useUserAudiosInfiniteQuery = (username: string, params: Record<string, any> = {}, size: number = 15) => {
+export const useAudiosInfinite = (key: string, params: Record<string, any> = {}, size: number = 15, options?: UseInfiniteQueryOptions<PagedList<Audio>>) => {
   Object.assign(params, { size });
-  const key = `users/${username}/audios?`;
-  return _useAudiosInfiniteQuery(key, params);
+  return useInfinitePagination<Audio>(key, (page) => fetchPages(key, params, page), params, options);
 }
 
-export const useUserFavoriteAudiosInfiniteQuery = (username: string, params: Record<string, any> = {}, size: number = 15) => {
+export const useAudiosPagination = (key: string, params: Record<string, any> = {}, size: number = 15, options?: UseQueryOptions<PagedList<Audio>>) => {
   Object.assign(params, { size });
-  const key = `users/${username}/favorites/audios`
-  return _useAudiosInfiniteQuery(key, params);
+  return usePagination(key, (page) => fetchPages(key, params, page), params, options);
 }

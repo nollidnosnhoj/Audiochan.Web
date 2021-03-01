@@ -1,9 +1,11 @@
 import axios, { Method } from 'axios'
 import createAuthRefreshInterceptor, { AxiosAuthRefreshRequestConfig } from 'axios-auth-refresh';
+import queryString from 'query-string'
 import config from '~/lib/config';
 import { refreshAccessToken } from '~/features/auth/services';
 import { isAxiosError } from './axios';
 import { getAccessToken } from './cookies';
+import { PagedList } from '~/lib/types';
 
 const backendApiClient = axios.create({
   baseURL: config.BACKEND_API,
@@ -89,13 +91,25 @@ function request<TResponse = any, TRequest = unknown>(route: string, method: Met
   });
 }
 
-export function fetch<TResponse>(route: string) {
-  const accessToken = getAccessToken();
+export interface FetchAudioOptions {
+  accessToken?: string;
+}
+
+export function fetch<TResponse>(route: string, options: FetchAudioOptions = {}) {
+  const accessToken = options.accessToken || getAccessToken();
   return new Promise<TResponse>((resolve, reject) => {
     getRequest(route, {accessToken}).then(({ data }) => {
       resolve(data)
     }).catch(err => reject(err));
   })
+}
+
+export const fetchPages = async <TData>(key: string, params: Record<string, any>, page: number = 1, options: FetchAudioOptions = {}) => {
+  const qs = `?page=${page}&${queryString.stringify(params)}`
+  const { data } = await getRequest<PagedList<TData>>(key + qs, {
+    accessToken: options.accessToken
+  });
+  return data;
 }
 
 export default {
