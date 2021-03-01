@@ -31,7 +31,6 @@ import Link from "./Link";
 import VolumeSliderButton from "./VolumeSliderButton";
 import useUser from "~/contexts/userContext";
 import Container from "./Container";
-import AuthButton from "~/features/auth/components/AuthButton";
 
 interface HeaderNavLinkProps {
   href: string;
@@ -104,19 +103,26 @@ const Header: React.FC<HeaderProps> = (props) => {
     </Box>
   ) : (
     <>
-      <AuthButton
-        initialAuthType="login"
-        colorScheme="gray"
-        size="md"
-        variant="ghost"
-      />
-      <AuthButton
-        colorScheme="primary"
-        size="md"
-        variant="ghost"
-        initialAuthType="register"
-        display={{ base: "none", md: "flex" }}
-      />
+      <NextLink href="/login">
+        <Button
+          size="md"
+          colorScheme="gray"
+          variant="ghost"
+          textTransform="uppercase"
+        >
+          Login
+        </Button>
+      </NextLink>
+      <NextLink href="/register">
+        <Button
+          size="md"
+          colorScheme="primary"
+          variant="ghost"
+          textTransform="uppercase"
+        >
+          Register
+        </Button>
+      </NextLink>
     </>
   );
 

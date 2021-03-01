@@ -24,6 +24,7 @@ type UserContextType = {
   logout: (message?: string) => Promise<boolean>;
   updateUser: (updatedUser: CurrentUser) => void;
   isLoading: boolean;
+  isLoggedIn: boolean;
 };
 
 const UserContext = createContext<UserContextType>({} as UserContextType);
@@ -115,6 +116,7 @@ export function UserProvider(props: PropsWithChildren<UserProviderProps>) {
       login: authenticate,
       logout: deauthenticate,
       isLoading: loadingUser,
+      isLoggedIn: Boolean(user),
     }),
     [user, loadingUser]
   );

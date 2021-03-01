@@ -34,7 +34,11 @@ const schema: yup.SchemaOf<RegisterFormInputs> = yup
   })
   .defined();
 
-export default function RegisterForm() {
+interface RegisterFormProps {
+  onSuccess: () => void;
+}
+
+export default function RegisterForm(props: RegisterFormProps) {
   const [error, setError] = useState("");
   const formik = useFormik<RegisterFormInputs>({
     initialValues: {
@@ -57,6 +61,7 @@ export default function RegisterForm() {
           title: "Thank you for registering.",
           message: "You can now login to your account.",
         });
+        if (props.onSuccess) props.onSuccess();
       } catch (err) {
         let errorMessage = "An error has occurred.";
         if (isAxiosError<ErrorResponse>(err)) {
