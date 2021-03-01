@@ -101,11 +101,13 @@ export function UserProvider(props: PropsWithChildren<UserProviderProps>) {
   }, [user]);
 
   useInterval(() => {
-    const now = Date.now() / 1000;
-    if (expires <= now) {
-      refreshAccessToken().then((result) => {
-        setExpirationToLocalStorage(result.accessTokenExpires);
-      });
+    if (user) {
+      const now = Date.now() / 1000;
+      if (expires <= now) {
+        refreshAccessToken().then((result) => {
+          setExpirationToLocalStorage(result.accessTokenExpires);
+        });
+      }
     }
   }, 1000 * 60);
 
