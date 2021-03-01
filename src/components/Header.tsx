@@ -55,7 +55,7 @@ const Header: React.FC<HeaderProps> = (props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const HeaderNavLinks = (
-    <React.Fragment>
+    <HStack spacing={2}>
       <HeaderNavLink href="/audios" icon={<MdLibraryMusic />}>
         Browse
       </HeaderNavLink>
@@ -68,7 +68,7 @@ const Header: React.FC<HeaderProps> = (props) => {
           Upload
         </HeaderNavLink>
       )}
-    </React.Fragment>
+    </HStack>
   );
 
   const UserMenu = user ? (
