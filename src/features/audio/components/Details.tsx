@@ -120,7 +120,10 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
           <Spacer />
           <HStack justifyContent="flex-end">
             {currentUser && currentUser.id !== audio.user.id && (
-              <Tooltip label={isFavorite ? "Unfavorite" : "Favorite"}>
+              <Tooltip
+                label={isFavorite ? "Unfavorite" : "Favorite"}
+                placement="top"
+              >
                 <span>
                   <IconButton
                     isRound
@@ -136,14 +139,18 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
               </Tooltip>
             )}
             {audio.user.id === currentUser?.id && (
-              <IconButton
-                isRound
-                variant="ghost"
-                size="lg"
-                icon={<EditIcon />}
-                aria-label="Edit"
-                onClick={onEditOpen}
-              />
+              <Tooltip label="Edit" placement="top">
+                <span>
+                  <IconButton
+                    isRound
+                    variant="ghost"
+                    size="lg"
+                    icon={<EditIcon />}
+                    aria-label="Edit"
+                    onClick={onEditOpen}
+                  />
+                </span>
+              </Tooltip>
             )}
           </HStack>
         </Stack>
