@@ -7,7 +7,7 @@ import { errorToast } from "~/utils/toast";
 
 interface PictureDropzoneProps {
   name: string;
-  onChange: (file: File) => void;
+  onChange: (imageData: string) => void;
   image?: string;
   disabled?: boolean;
 }

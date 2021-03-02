@@ -109,12 +109,7 @@ const Header: React.FC<HeaderProps> = (props) => {
         </Button>
       </NextLink>
       <NextLink href="/register">
-        <Button
-          size="md"
-          colorScheme="primary"
-          variant="ghost"
-          textTransform="uppercase"
-        >
+        <Button size="md" colorScheme="primary" textTransform="uppercase">
           Register
         </Button>
       </NextLink>

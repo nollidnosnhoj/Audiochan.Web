@@ -49,14 +49,10 @@ const Picture: React.FC<PictureProps & BoxProps> = ({
           name="image"
           image={src}
           disabled={disabled}
-          onChange={async (file) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => {
-              if (onReplace) {
-                onReplace(reader.result as string);
-              }
-            };
+          onChange={async (data) => {
+            if (onReplace) {
+              onReplace(data);
+            }
           }}
         />
       )}

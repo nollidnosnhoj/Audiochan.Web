@@ -58,7 +58,7 @@ export default function AudioUpload(props: AudioUploadProps) {
             <Box padding={4} textAlign="center">
               <Picture
                 src={picture}
-                size={200}
+                size={250}
                 disableNextImage
                 canReplace={true}
                 onReplace={(data) => setPicture(data)}
