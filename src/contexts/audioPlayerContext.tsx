@@ -1,112 +1,113 @@
 import React, {
   createContext,
   PropsWithChildren,
-  useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from "react";
-import { Audio } from "~/features/audio/types";
+import {
+  AudioPlayerItemInfo,
+  AudioPlayerListItem,
+} from "~/features/audio/types";
 
-interface AudioPlayerContextProps {
-  currentAudio: Audio | undefined;
-  loop: boolean;
+type AudioPlayerContextType = {
+  audioList: AudioPlayerListItem[];
+  clearPriorAudioList: boolean;
+  current: AudioPlayerItemInfo | undefined;
+  playIndex: number | undefined;
   volume: number;
-  position: number;
-  playing: boolean;
-  handleLoop: () => void;
-  handleVolume: (level: number) => void;
-  handlePosition: (pos: number) => void;
-  handlePlaying: (state: boolean) => void;
-  setCurrentAudio: (audio: Audio) => void;
-}
+  addToQueue: (item: AudioPlayerListItem) => void;
+  clearQueue: () => void;
+  currentPlaying: (info: AudioPlayerItemInfo) => void;
+  startPlay: (list: AudioPlayerListItem[]) => void;
+  syncQueue: (list: AudioPlayerListItem[]) => void;
+  volumeChange: (level: number) => void;
+};
 
-const AudioPlayerContext = createContext<AudioPlayerContextProps>(
-  {} as AudioPlayerContextProps
+const AudioPlayerContext = createContext<AudioPlayerContextType>(
+  {} as AudioPlayerContextType
 );
 
-export function AudioPlayerProvider(props: PropsWithChildren<any>) {
-  const [currentAudio, setCurrentAudio] = useState<Audio | undefined>(
+export default function AudioPlayerProvider(props: PropsWithChildren<any>) {
+  const [audioList, setAudioList] = useState<AudioPlayerListItem[]>([]);
+  const [playIndex, setPlayIndex] = useState<number | undefined>(undefined);
+  const [volume, setVolume] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      return (
+        parseInt(window.localStorage.getItem("playerVolume") || "0.5") || 0.5
+      );
+    }
+
+    return 0.5;
+  });
+  const [clearPriorAudioList, setClearPriorAudioList] = useState(true);
+  const [current, setCurrent] = useState<AudioPlayerItemInfo | undefined>(
     undefined
   );
-  const [loop, setLoop] = useState(false);
-  const [volume, setVolume] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [position, setPosition] = useState(0);
 
-  useEffect(() => {
-    setVolume(parseFloat(window.localStorage.getItem("playerVolume") || "0.7"));
-  }, []);
+  const currentPlaying = (info: AudioPlayerItemInfo) => {
+    setCurrent(() => {
+      if (info.ended) return undefined;
+      if (info.audioId !== current?.audioId) return info;
+    });
+  };
 
-  useEffect(() => {
-    setLoop(currentAudio?.isLoop ?? false);
-  }, [currentAudio?.isLoop]);
+  const startPlay = (list: AudioPlayerListItem[]) => {
+    setAudioList(list);
+    setPlayIndex(0);
+    setClearPriorAudioList(true);
+  };
 
-  const onAudioChange = useCallback(
-    (audio: Audio) => {
-      setCurrentAudio(audio);
-    },
-    [setCurrentAudio]
-  );
+  const addToQueue = (item: AudioPlayerListItem) => {
+    setAudioList((previousList) => [...previousList, item]);
+    setClearPriorAudioList(false);
+    setPlayIndex(undefined);
+  };
 
-  const onSetPlaying = useCallback(
-    (state: boolean) => {
-      setPlaying(state);
-    },
-    [setPlaying]
-  );
+  const volumeChange = (level: number) => {
+    setVolume(level);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("playerVolume", level + "");
+    }
+  };
 
-  const onPositionChange = useCallback(
-    (pos: number) => {
-      if (!currentAudio) {
-        setPosition(0);
-        return;
-      }
-      pos = Math.min(pos, currentAudio.duration);
-      pos = Math.max(pos, 0);
-      setPosition(pos);
-    },
-    [position, currentAudio, setPosition]
-  );
+  const clearQueue = () => {
+    setAudioList([]);
+    setPlayIndex(undefined);
+    setCurrent(undefined);
+  };
 
-  const onVolumeChange = useCallback(
-    (level: number) => {
-      level = Math.min(level, 1);
-      level = Math.max(0, level);
-      setVolume(level);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("playerVolume", JSON.stringify(level));
-      }
-    },
-    [setVolume]
-  );
+  const syncQueue = (list: AudioPlayerListItem[]) => {
+    if (list.length === 0) setCurrent(undefined);
+    setAudioList(list);
+  };
 
-  const onLoopChange = useCallback(() => {
-    setLoop(!loop);
-  }, [loop, setLoop]);
-
-  const values = useMemo<AudioPlayerContextProps>(
+  const values: AudioPlayerContextType = useMemo(
     () => ({
-      currentAudio,
-      loop,
-      volume,
-      playing,
-      position,
-      handleLoop: onLoopChange,
-      handleVolume: onVolumeChange,
-      handlePlaying: onSetPlaying,
-      handlePosition: onPositionChange,
-      setCurrentAudio: onAudioChange,
+      audioList: audioList,
+      clearPriorAudioList: clearPriorAudioList,
+      current: current,
+      playIndex: playIndex,
+      volume: volume,
+      addToQueue: addToQueue,
+      currentPlaying: currentPlaying,
+      clearQueue: clearQueue,
+      startPlay: startPlay,
+      syncQueue: syncQueue,
+      volumeChange: volumeChange,
     }),
     [
+      audioList,
+      clearPriorAudioList,
+      current,
+      playIndex,
+      clearQueue,
+      syncQueue,
       volume,
-      playing,
-      position,
-      onVolumeChange,
-      onSetPlaying,
-      onPositionChange,
-      onAudioChange,
+      volumeChange,
+      startPlay,
+      currentPlaying,
+      addToQueue,
     ]
   );
 
@@ -117,6 +118,4 @@ export function AudioPlayerProvider(props: PropsWithChildren<any>) {
   );
 }
 
-export function useAudioPlayer() {
-  return useContext(AudioPlayerContext);
-}
+export const useAudioPlayer = () => useContext(AudioPlayerContext);

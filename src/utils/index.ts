@@ -1,4 +1,6 @@
+import { ReactJkMusicPlayerAudioListProps } from "react-jinke-music-player";
 import slugify from "slugify";
+import { Audio } from "~/features/audio/types";
 
 export const validationMessages = {
   required: function (field: string) {
@@ -36,4 +38,15 @@ export function objectToFormData(values: object): FormData {
   });
 
   return formData;
+}
+
+export function mapToAudioListProps(audio: Audio): ReactJkMusicPlayerAudioListProps {
+  return {
+    audioId: audio.id,
+    name: audio.title,
+    singer: audio.user.username,
+    cover: `https://audiochan.s3.amazonaws.com/${audio.picture}`,
+    duration: audio.duration,
+    musicSrc: `http://audiochan.s3.amazonaws.com/audios/${audio.uploadId}${audio.fileExt}`
+  }
 }

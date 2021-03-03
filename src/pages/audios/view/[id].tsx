@@ -1,23 +1,14 @@
 import React from "react";
 import { Box, Flex } from "@chakra-ui/react";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { QueryClient } from "react-query";
 import { dehydrate } from "react-query/hydration";
 import AudioDetails from "~/features/audio/components/Details";
-import Container from "~/components/Container";
 import Page from "~/components/Page";
 import { getAccessToken } from "~/utils/cookies";
 import { useAudio } from "~/features/audio/hooks/queries";
 import { fetchAudioById } from "~/features/audio/services/fetch";
-
-const DynamicAudioPlayer = dynamic(
-  () => import("~/features/audio/components/Player"),
-  {
-    ssr: false,
-  }
-);
 
 // Fetch the audio detail and render it onto the server.
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -54,14 +45,7 @@ export default function AudioDetailsPage(
   if (!audio) return null;
 
   return (
-    <Page
-      title={audio.title ?? "Removed"}
-      beforeContainer={
-        <Container>
-          <DynamicAudioPlayer audio={audio} />
-        </Container>
-      }
-    >
+    <Page title={audio.title}>
       <Box>
         <AudioDetails audio={audio} />
       </Box>

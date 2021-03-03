@@ -15,6 +15,7 @@ import {
   VStack,
   Wrap,
   WrapItem,
+  chakra,
 } from "@chakra-ui/react";
 import Router from "next/router";
 import React, { useEffect, useMemo, useState } from "react";
@@ -33,6 +34,10 @@ import { errorToast, successfulToast } from "~/utils/toast";
 import useUser from "~/contexts/userContext";
 import { ErrorResponse } from "~/lib/types";
 import { isAxiosError } from "~/utils/axios";
+import { FaPlay } from "react-icons/fa";
+import { MdQueueMusic } from "react-icons/md";
+import { useAudioPlayer } from "~/contexts/audioPlayerContext";
+import { mapToAudioListProps } from "~/utils";
 
 interface AudioDetailProps {
   audio: Audio;
@@ -41,6 +46,7 @@ interface AudioDetailProps {
 const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
   const secondaryColor = useColorModeValue("black.300", "gray.300");
   const { user: currentUser } = useUser();
+  const { startPlay, addToQueue } = useAudioPlayer();
 
   const {
     isFavorite,
@@ -110,7 +116,7 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
         />
       </Box>
       <Box flex="3">
-        <Stack direction="row" alignItems="center">
+        <Stack direction="row" alignItems="center" marginBottom={4}>
           <Stack direction="column" spacing="0" fontSize="sm">
             <Link href={`/users/${audio.user.username}`}>
               <Text fontWeight="500">{audio.user.username}</Text>
@@ -119,6 +125,29 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
           </Stack>
           <Spacer />
           <HStack justifyContent="flex-end">
+            <Tooltip label="Play" placement="top">
+              <span>
+                <IconButton
+                  isRound
+                  colorScheme="pink"
+                  size="lg"
+                  icon={<FaPlay />}
+                  aria-label="Play"
+                  onClick={() => startPlay([mapToAudioListProps(audio)])}
+                />
+              </span>
+            </Tooltip>
+            <Tooltip label="Add to queue" placement="top">
+              <span>
+                <IconButton
+                  isRound
+                  size="lg"
+                  icon={<MdQueueMusic />}
+                  aria-label="Add to queue"
+                  onClick={() => addToQueue(mapToAudioListProps(audio))}
+                />
+              </span>
+            </Tooltip>
             {currentUser && currentUser.id !== audio.user.id && (
               <Tooltip
                 label={isFavorite ? "Unfavorite" : "Favorite"}
@@ -138,20 +167,6 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
                 </span>
               </Tooltip>
             )}
-            {audio.user.id === currentUser?.id && (
-              <Tooltip label="Edit" placement="top">
-                <span>
-                  <IconButton
-                    isRound
-                    variant="ghost"
-                    size="lg"
-                    icon={<EditIcon />}
-                    aria-label="Edit"
-                    onClick={onEditOpen}
-                  />
-                </span>
-              </Tooltip>
-            )}
           </HStack>
         </Stack>
         <Stack direction="row">
@@ -160,6 +175,20 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
               <Heading as="h1" fontSize="2xl">
                 {audio.title}
               </Heading>
+              {audio.user.id === currentUser?.id && (
+                <Tooltip label="Edit" placement="top">
+                  <chakra.span marginLeft={4}>
+                    <IconButton
+                      isRound
+                      variant="ghost"
+                      size="lg"
+                      icon={<EditIcon />}
+                      aria-label="Edit"
+                      onClick={onEditOpen}
+                    />
+                  </chakra.span>
+                </Tooltip>
+              )}
               <Spacer />
               <VStack spacing={2} alignItems="normal" textAlign="right">
                 <Box>
