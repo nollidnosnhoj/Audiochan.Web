@@ -1,8 +1,8 @@
 import { Box } from "@chakra-ui/react";
 import Head from "next/head";
 import React from "react";
-import Container from "~/components/Container";
 import Header from "~/components/Header";
+import Container from "~/components/Container";
 
 interface PageProps {
   title?: string;
@@ -26,7 +26,7 @@ const Page: React.FC<PageProps> = ({
         {useHeader && <Header />}
         {beforeContainer}
       </Box>
-      <Container pb="3" pt="3" px="5" {...props}>
+      <Container pb="120px" pt="3" px="5" {...props}>
         {children}
       </Container>
     </>

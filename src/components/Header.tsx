@@ -23,7 +23,6 @@ import { FaCloudUploadAlt, FaUserAlt } from "react-icons/fa";
 import { MdLibraryMusic } from "react-icons/md";
 import NextLink from "next/link";
 import Link from "./Link";
-import VolumeSliderButton from "./VolumeSliderButton";
 import useUser from "~/contexts/userContext";
 import Container from "./Container";
 
@@ -151,7 +150,6 @@ const Header: React.FC<HeaderProps> = (props) => {
                   variant="ghost"
                   onClick={toggleColorMode}
                 />
-                <VolumeSliderButton />
                 {UserMenu}
               </HStack>
             </Flex>
