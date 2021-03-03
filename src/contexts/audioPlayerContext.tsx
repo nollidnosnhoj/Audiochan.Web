@@ -59,6 +59,7 @@ export default function AudioPlayerProvider(props: PropsWithChildren<any>) {
   };
 
   const addToQueue = (item: AudioPlayerListItem) => {
+    if (audioList.some((x) => x.audioId == item.audioId)) return;
     setAudioList((previousList) => [...previousList, item]);
     setClearPriorAudioList(false);
     setPlayIndex(undefined);
