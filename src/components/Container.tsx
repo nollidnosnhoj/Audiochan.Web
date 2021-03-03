@@ -1,18 +1,11 @@
-import React from "react";
-import { Box, BoxProps } from "@chakra-ui/react";
+import { BoxProps, Container, Stack } from "@chakra-ui/react";
 
-const Container: React.FC<BoxProps> = (props) => {
+const AudiochanContainer: React.FC<BoxProps> = ({ children, ...props }) => {
   return (
-    <Box
-      w="full"
-      mx="auto"
-      maxW="1500px"
-      px={{ base: "2", md: "6" }}
-      {...props}
-    >
-      {props.children}
-    </Box>
+    <Container as={Stack} maxW="8xl" px={{ base: "2", md: "6" }} {...props}>
+      {children}
+    </Container>
   );
 };
 
-export default Container;
+export default AudiochanContainer;

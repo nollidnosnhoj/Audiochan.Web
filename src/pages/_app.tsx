@@ -45,8 +45,8 @@ function App({ Component, user, pageProps }: AppProps) {
               <AudioPlayerProvider>
                 <PageLoader color={theme.colors.primary[500]} />
                 <Component {...pageProps} />
-                <ReactQueryDevtools initialIsOpen={false} />
                 <AudioPlayer />
+                <ReactQueryDevtools initialIsOpen={false} />
               </AudioPlayerProvider>
             </UserProvider>
           </ChakraProvider>

@@ -141,11 +141,11 @@ export default function AudioPlayer() {
     autoPlayInitLoadPlayList: true,
     loadAudioErrorPlayNext: false,
     clearPriorAudioLists: false,
-    showDestroy: true,
+    showDestroy: false,
     showDownload: false,
     showReload: false,
     glassBg: true,
-    showThemeSwitch: true,
+    showThemeSwitch: false,
     showMediaSession: true,
     defaultPosition: {
       top: 300,
