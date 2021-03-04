@@ -1,63 +1,41 @@
-import { Box, BoxProps, Image, VStack } from "@chakra-ui/react";
-import React from "react";
+import { Box, useColorModeValue } from "@chakra-ui/react";
+import React, { useMemo } from "react";
 import NextImage from "next/image";
-import { usePictureGradient } from "~/hooks/usePictureGradient";
-import PictureDropzone from "./PictureDropzone";
 
 interface PictureProps {
-  src: string;
-  size: number;
-  isEager?: boolean;
-  disableNextImage?: boolean;
-  canReplace?: boolean;
-  onReplace?: (imageData: string) => void;
-  disabled?: boolean;
+  source: string;
+  imageSize: number;
+  isLazy?: boolean;
+  onClick?: () => void;
 }
 
-const Picture: React.FC<PictureProps & BoxProps> = ({
-  src,
-  size,
-  onReplace,
-  canReplace = false,
-  isEager = false,
-  disableNextImage = false,
-  disabled = false,
-  children,
-  ...props
-}) => {
-  const [color1, color2] = usePictureGradient();
+export default function Picture(props: PictureProps) {
+  const { source, imageSize, isLazy = false, onClick } = props;
+  const color1 = useColorModeValue("gray.500", "gray.900");
+  const color2 = useColorModeValue("gray.400", "gray.800");
+
   return (
-    <VStack>
-      <Box
-        bgGradient={`linear(to-r, ${color1}, ${color2})`}
-        boxSize={size}
-        {...props}
-      >
-        {src && !disableNextImage ? (
-          <NextImage
-            src={src}
-            width={size}
-            height={size}
-            loading={isEager ? "eager" : "lazy"}
-          />
-        ) : (
-          <Image src={src} height={size} />
-        )}
-      </Box>
-      {canReplace && (
-        <PictureDropzone
-          name="image"
-          image={src}
-          disabled={disabled}
-          onChange={async (data) => {
-            if (onReplace) {
-              onReplace(data);
-            }
-          }}
+    <Box
+      bgGradient={`linear(to-r, ${color1}, ${color2})`}
+      width={imageSize}
+      borderWidth={1}
+      _after={{
+        content: '""',
+        display: "block",
+        paddingBottom: "100%",
+      }}
+      position="relative"
+      onClick={onClick}
+      cursor={onClick && "pointer"}
+    >
+      {source && (
+        <NextImage
+          src={source}
+          layout="fill"
+          objectFit="cover"
+          loading={isLazy ? "lazy" : "eager"}
         />
       )}
-    </VStack>
+    </Box>
   );
-};
-
-export default Picture;
+}

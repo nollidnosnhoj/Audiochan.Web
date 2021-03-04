@@ -19,7 +19,7 @@ type AudioPlayerContextType = {
   addToQueue: (item: AudioPlayerListItem) => void;
   clearQueue: () => void;
   currentPlaying: (info: AudioPlayerItemInfo) => void;
-  startPlay: (list: AudioPlayerListItem[]) => void;
+  startPlay: (list: AudioPlayerListItem[], index: number) => void;
   syncQueue: (list: AudioPlayerListItem[]) => void;
   volumeChange: (level: number) => void;
 };
@@ -52,9 +52,9 @@ export default function AudioPlayerProvider(props: PropsWithChildren<any>) {
     });
   };
 
-  const startPlay = (list: AudioPlayerListItem[]) => {
+  const startPlay = (list: AudioPlayerListItem[], index: number = 0) => {
     setAudioList(list);
-    setPlayIndex(0);
+    setPlayIndex(index);
     setClearPriorAudioList(true);
   };
 

@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Spacer, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Spacer, Text, VStack } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { useFormik } from "formik";
 import AudioUploadDropzone from "./Dropzone";
@@ -10,6 +10,7 @@ import TextInput from "~/components/Form/TextInput";
 import { AudioRequest } from "~/features/audio/types";
 import { uploadAudioSchema } from "~/features/audio/schemas";
 import Picture from "~/components/Picture";
+import PictureDropzone from "~/components/Picture/PictureDropzone";
 
 interface AudioUploadProps {
   maxFileSize?: number;
@@ -56,13 +57,14 @@ export default function AudioUpload(props: AudioUploadProps) {
         <Flex>
           <Flex flex="1" justifyContent="center">
             <Box padding={4} textAlign="center">
-              <Picture
-                src={picture}
-                size={250}
-                disableNextImage
-                canReplace={true}
-                onReplace={(data) => setPicture(data)}
-              />
+              <PictureDropzone
+                image={picture}
+                onChange={(data) => {
+                  setPicture(data);
+                }}
+              >
+                <Picture source={picture} imageSize={250} />
+              </PictureDropzone>
             </Box>
           </Flex>
           <Box flex="3">

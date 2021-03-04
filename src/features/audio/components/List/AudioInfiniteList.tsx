@@ -1,4 +1,4 @@
-import { Box, Button } from "@chakra-ui/react";
+import { Box, Button, Divider } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 import { PagedList } from "~/lib/types";
 import { useAudiosInfinite } from "../../hooks/queries";
@@ -54,8 +54,11 @@ export default function AudioInfiniteList(props: AudioListProps) {
   return (
     <Box>
       {audios.length === 0 && <p>No audio found.</p>}
-      {audios.map((audio) => (
-        <AudioListItem key={audio.id} audio={audio} />
+      {audios.map((audio, index) => (
+        <Box marginTop={4} key={index}>
+          <AudioListItem listIndex={index} audio={audio} />
+          {index !== audios.length - 1 && <Divider />}
+        </Box>
       ))}
       {hasNextPage && (
         <Button

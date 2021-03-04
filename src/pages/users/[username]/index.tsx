@@ -8,6 +8,7 @@ import {
   TabPanels,
   Tabs,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { GetServerSideProps } from "next";
@@ -26,6 +27,7 @@ import { fetchUserProfile } from "~/features/user/services/fetch";
 import { isAxiosError } from "~/utils/axios";
 import { ErrorResponse } from "~/lib/types";
 import { errorToast } from "~/utils/toast";
+import PictureDropzone from "~/components/Picture/PictureDropzone";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const queryClient = new QueryClient();
@@ -55,7 +57,7 @@ export default function ProfilePage() {
   if (!profile) return null;
   const {
     mutateAsync: addPictureAsync,
-    isLoading: isAdddingPicture,
+    isLoading: isAddingPicture,
   } = useAddUserPicture(username);
 
   const [picture, setPicture] = useState(() => {
@@ -71,29 +73,31 @@ export default function ProfilePage() {
       <Flex direction="row">
         <Flex flex="1" direction="column" justify="center">
           <Box textAlign="center">
-            <Picture
-              src={picture}
-              size={250}
-              disabled={isAdddingPicture}
-              canReplace={user?.id === profile.id}
-              onReplace={(data) => {
-                addPictureAsync(data)
-                  .then(({ data: { image } }) => {
-                    setPicture(image);
-                  })
-                  .catch((err) => {
-                    if (
-                      isAxiosError<ErrorResponse>(err) &&
-                      err.response?.status === 429
-                    ) {
-                      errorToast({
-                        title: "Too many requests.",
-                        message: "Try again later.",
-                      });
-                    }
-                  });
-              }}
-            />
+            <VStack>
+              <PictureDropzone
+                image={picture}
+                disabled={isAddingPicture && user?.id === profile.id}
+                onChange={(data) => {
+                  addPictureAsync(data)
+                    .then(({ data: { image } }) => {
+                      setPicture(image);
+                    })
+                    .catch((err) => {
+                      if (
+                        isAxiosError<ErrorResponse>(err) &&
+                        err.response?.status === 429
+                      ) {
+                        errorToast({
+                          title: "Too many requests.",
+                          message: "Try again later.",
+                        });
+                      }
+                    });
+                }}
+              >
+                <Picture source={picture} imageSize={250} />
+              </PictureDropzone>
+            </VStack>
           </Box>
           <Box textAlign="center" marginY={4}>
             <Text fontSize="2xl" as="strong">

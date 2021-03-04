@@ -38,6 +38,7 @@ import { FaPlay } from "react-icons/fa";
 import { MdQueueMusic } from "react-icons/md";
 import { useAudioPlayer } from "~/contexts/audioPlayerContext";
 import { mapToAudioListProps } from "~/utils";
+import PictureDropzone from "~/components/Picture/PictureDropzone";
 
 interface AudioDetailProps {
   audio: Audio;
@@ -86,13 +87,10 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
   return (
     <Flex marginBottom={4} width="100%">
       <Box flex="1">
-        <Picture
-          src={picture}
-          size={200}
-          isEager
-          disabled={isAddingArtwork}
-          canReplace={currentUser?.id === audio.user.id}
-          onReplace={(data) => {
+        <PictureDropzone
+          image={picture}
+          disabled={isAddingArtwork && currentUser?.id === audio.user.id}
+          onChange={(data) => {
             uploadArtwork(data)
               .then(({ data }) => {
                 setPicture(data.image);
@@ -113,10 +111,12 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
                 }
               });
           }}
-        />
+        >
+          <Picture source={picture} imageSize={250} />
+        </PictureDropzone>
       </Box>
       <Box flex="3">
-        <Stack direction="row" alignItems="center" marginBottom={4}>
+        <Stack direction="row" marginBottom={4}>
           <Stack direction="column" spacing="0" fontSize="sm">
             <Link href={`/users/${audio.user.username}`}>
               <Text fontWeight="500">{audio.user.username}</Text>
@@ -133,7 +133,7 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
                   size="lg"
                   icon={<FaPlay />}
                   aria-label="Play"
-                  onClick={() => startPlay([mapToAudioListProps(audio)])}
+                  onClick={() => startPlay([mapToAudioListProps(audio)], 0)}
                 />
               </span>
             </Tooltip>
@@ -169,9 +169,9 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
             )}
           </HStack>
         </Stack>
-        <Stack direction="row">
-          <Stack direction="column" spacing={2} width="100%">
-            <Flex as="header" alignItems="center">
+        <Stack direction="column" spacing={2} width="100%">
+          <Flex as="header" alignItems="center">
+            <Box>
               <Heading as="h1" fontSize="2xl">
                 {audio.title}
               </Heading>
@@ -189,33 +189,33 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
                   </chakra.span>
                 </Tooltip>
               )}
-              <Spacer />
-              <VStack spacing={2} alignItems="normal" textAlign="right">
-                <Box>
-                  {audio.genre && (
-                    <Badge fontSize="sm" letterSpacing="1.1" fontWeight="800">
-                      {audio.genre.name}
-                    </Badge>
-                  )}
-                </Box>
-                <Box color={secondaryColor}>{audioDurationFormatted}</Box>
-              </VStack>
-            </Flex>
-            <Text fontSize="sm" color={secondaryColor}>
-              {audio.description || "No information given."}
-            </Text>
-            {audio.tags && (
+              <Text fontSize="sm" color={secondaryColor} marginTop={4}>
+                {audio.description || "No information given."}
+              </Text>
+            </Box>
+            <Spacer />
+            <VStack spacing={2} alignItems="normal" textAlign="right">
               <Box>
-                <Wrap marginTop={2}>
-                  {audio.tags.map((tag, idx) => (
-                    <WrapItem key={idx}>
-                      <Tag size="sm">{tag}</Tag>
-                    </WrapItem>
-                  ))}
-                </Wrap>
+                {audio.genre && (
+                  <Badge fontSize="sm" letterSpacing="1.1" fontWeight="800">
+                    {audio.genre.name}
+                  </Badge>
+                )}
               </Box>
-            )}
-          </Stack>
+              <Box color={secondaryColor}>{audioDurationFormatted}</Box>
+            </VStack>
+          </Flex>
+          {audio.tags && (
+            <Box>
+              <Wrap marginTop={2}>
+                {audio.tags.map((tag, idx) => (
+                  <WrapItem key={idx}>
+                    <Tag size="sm">{tag}</Tag>
+                  </WrapItem>
+                ))}
+              </Wrap>
+            </Box>
+          )}
         </Stack>
       </Box>
       <AudioEdit audio={audio} isOpen={isEditOpen} onClose={onEditClose} />
