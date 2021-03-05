@@ -87,6 +87,7 @@ export default function AudioUpload(props: AudioUploadProps) {
             />
             <GenreSelect
               name="genre"
+              label="Genre"
               value={values.genre ?? ""}
               onChange={handleChange}
               error={errors.genre}

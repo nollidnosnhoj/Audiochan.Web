@@ -142,6 +142,7 @@ const AudioEditModal: React.FC<AudioEditProps> = ({
             />
             <GenreSelect
               name="genre"
+              label="Genre"
               value={values.genre ?? ""}
               onChange={handleChange}
               error={errors.genre}

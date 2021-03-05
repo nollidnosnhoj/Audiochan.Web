@@ -11,11 +11,13 @@ import api from "~/utils/api";
 interface GenreSelectProps {
   name: string;
   value: string;
-  onChange: (e: React.ChangeEvent) => void;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  label?: string;
   error?: string;
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
+  addAllGenres?: boolean;
 }
 
 const GenreSelect: React.FC<GenreSelectProps> = ({
@@ -24,6 +26,8 @@ const GenreSelect: React.FC<GenreSelectProps> = ({
   onChange,
   error,
   placeholder,
+  label = "",
+  addAllGenres = false,
   required = false,
   disabled = false,
 }) => {
@@ -48,7 +52,7 @@ const GenreSelect: React.FC<GenreSelectProps> = ({
       isRequired={required}
       isInvalid={!!error}
     >
-      <FormLabel>Genre</FormLabel>
+      {label && <FormLabel>Genre</FormLabel>}
       <Select
         name={name}
         value={value}
@@ -56,6 +60,7 @@ const GenreSelect: React.FC<GenreSelectProps> = ({
         placeholder={placeholder}
         isDisabled={disabled}
       >
+        {addAllGenres && <option value="">All Genres</option>}
         {genres.map((g, i) => (
           <option key={i} value={g.slug}>
             {g.name}
