@@ -110,7 +110,6 @@ export default function AudioUploading(props: AudioUploadingProps) {
               description: "",
               tags: [],
               isPublic: true,
-              isLoop: false,
             }),
           };
 

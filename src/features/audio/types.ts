@@ -8,7 +8,6 @@ export type Audio = {
   title: string;
   description: string;
   isPublic: boolean;
-  isLoop: boolean;
   tags: string[];
   duration: number;
   fileSize: number;
@@ -29,7 +28,6 @@ export interface AudioRequest {
   description?: string;
   tags: string[];
   isPublic: boolean;
-  isLoop: boolean;
   genre?: string;
 };
 
