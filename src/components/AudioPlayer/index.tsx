@@ -7,7 +7,10 @@ import ReactJkMusicPlayer, {
 } from "react-jinke-music-player";
 import "react-jinke-music-player/assets/index.css";
 import { useAudioPlayer } from "~/contexts/audioPlayerContext";
-import { AudioPlayerItemInfo, AudioPlayerListItem } from "../types";
+import {
+  AudioPlayerItemInfo,
+  AudioPlayerListItem,
+} from "../../features/audio/types";
 
 export default function AudioPlayer() {
   const {
@@ -156,6 +159,8 @@ export default function AudioPlayer() {
       fadeOut: 200,
     },
   };
+
+  if (audioList.length === 0) return null;
 
   return (
     <ReactJkMusicPlayer

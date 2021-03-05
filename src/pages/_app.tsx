@@ -23,12 +23,9 @@ const queryClientConfig = {
   },
 };
 
-const AudioPlayer = dynamic(
-  () => import("~/features/audio/components/Player"),
-  {
-    ssr: false,
-  }
-);
+const AudioPlayer = dynamic(() => import("~/components/AudioPlayer"), {
+  ssr: false,
+});
 
 function App({ Component, user, pageProps }: AppProps) {
   const queryClientRef = React.useRef<QueryClient>();
