@@ -25,14 +25,10 @@ export default function AudioPlayer() {
   } = useAudioPlayer();
   const { colorMode, setColorMode } = useColorMode();
 
-  const getAudioInstance = useCallback(
-    (instance: ReactJkMusicPlayerInstance) => {
-      console.log("");
-      console.log("getAudioInstance()");
-      console.dir(instance);
-    },
-    []
-  );
+  // const getAudioInstance = useCallback(
+  //   (instance: ReactJkMusicPlayerInstance) => {},
+  //   []
+  // );
 
   const onAudioListsChange = useCallback(
     (
@@ -40,11 +36,6 @@ export default function AudioPlayer() {
       audioLists: AudioPlayerListItem[],
       audioInfo: AudioPlayerItemInfo
     ) => {
-      console.log("");
-      console.log("onAudioListsChange()");
-      console.log("currentPlayId", currentPlayId);
-      console.log("audioLists", audioLists);
-      console.log("audioInfo", audioInfo);
       syncQueue(audioLists);
     },
     []
@@ -56,11 +47,6 @@ export default function AudioPlayer() {
       audioLists: AudioPlayerListItem[],
       audioInfo: AudioPlayerItemInfo
     ) => {
-      console.log("");
-      console.log("onAudioPlayTrackChange()");
-      console.log("currentPlayId", currentPlayId);
-      console.log("audioLists", audioLists);
-      console.log("audioInfo", audioInfo);
       currentPlaying(audioInfo);
     },
     [currentPlaying]
@@ -68,9 +54,6 @@ export default function AudioPlayer() {
 
   const onAudioPlay = useCallback(
     (audioInfo: AudioPlayerItemInfo) => {
-      console.log("");
-      console.log("onAudioPlay()");
-      console.log("audioInfo", audioInfo);
       currentPlaying(audioInfo);
     },
     [currentPlaying]
@@ -88,9 +71,6 @@ export default function AudioPlayer() {
 
   const onThemeChange = useCallback(
     (theme: ReactJkMusicPlayerTheme) => {
-      console.log("");
-      console.log("onThemeChange()");
-      console.log("theme", theme);
       setColorMode(theme);
     },
     [setColorMode]
@@ -124,12 +104,7 @@ export default function AudioPlayer() {
       audioLists: AudioPlayerListItem[],
       audioInfo: AudioPlayerItemInfo
     ) => {
-      console.log("");
-      console.log("onAudioError()");
       console.log("error", error);
-      console.log("currentPlayId", currentPlayId);
-      console.log("audioLists", audioLists);
-      console.log("audioInfo", audioInfo);
     },
     []
   );
@@ -169,7 +144,7 @@ export default function AudioPlayer() {
       theme={colorMode}
       playIndex={playIndex}
       defaultVolume={volume}
-      getAudioInstance={getAudioInstance}
+      // getAudioInstance={getAudioInstance}
       onAudioListsChange={onAudioListsChange}
       onAudioPlayTrackChange={onAudioPlayTrackChange}
       onAudioPlay={onAudioPlay}
