@@ -2,15 +2,22 @@ import { Box, useColorModeValue } from "@chakra-ui/react";
 import React, { useMemo } from "react";
 import NextImage from "next/image";
 
-interface PictureProps {
+export interface PictureProps {
   source: string;
   imageSize: number;
   isLazy?: boolean;
   onClick?: () => void;
+  includeEditButton?: boolean;
 }
 
 export default function Picture(props: PictureProps) {
-  const { source, imageSize, isLazy = false, onClick } = props;
+  const {
+    source,
+    imageSize,
+    isLazy = false,
+    onClick,
+    includeEditButton = false,
+  } = props;
   const color1 = useColorModeValue("gray.500", "gray.900");
   const color2 = useColorModeValue("gray.400", "gray.800");
 

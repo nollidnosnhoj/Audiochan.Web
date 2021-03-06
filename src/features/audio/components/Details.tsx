@@ -88,28 +88,10 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
     <Flex marginBottom={4} width="100%">
       <Box flex="1">
         <PictureDropzone
-          image={picture}
           disabled={isAddingArtwork && currentUser?.id === audio.user.id}
-          onChange={(data) => {
-            uploadArtwork(data)
-              .then(({ data }) => {
-                setPicture(data.image);
-                successfulToast({
-                  title: "Image successfully uploaded.",
-                  message: "Image may take a couple minutes to update.",
-                });
-              })
-              .catch((err) => {
-                if (
-                  isAxiosError<ErrorResponse>(err) &&
-                  err.response?.status === 429
-                ) {
-                  errorToast({
-                    title: "Too many requests.",
-                    message: "Try again later.",
-                  });
-                }
-              });
+          onChange={async (croppedData) => {
+            const { data } = await uploadArtwork(croppedData);
+            setPicture(data.image);
           }}
         >
           <Picture source={picture} imageSize={250} />

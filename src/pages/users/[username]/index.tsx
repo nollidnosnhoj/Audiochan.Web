@@ -75,24 +75,10 @@ export default function ProfilePage() {
           <Box textAlign="center">
             <VStack>
               <PictureDropzone
-                image={picture}
                 disabled={isAddingPicture && user?.id === profile.id}
-                onChange={(data) => {
-                  addPictureAsync(data)
-                    .then(({ data: { image } }) => {
-                      setPicture(image);
-                    })
-                    .catch((err) => {
-                      if (
-                        isAxiosError<ErrorResponse>(err) &&
-                        err.response?.status === 429
-                      ) {
-                        errorToast({
-                          title: "Too many requests.",
-                          message: "Try again later.",
-                        });
-                      }
-                    });
+                onChange={async (imageData) => {
+                  const { data } = await addPictureAsync(imageData);
+                  setPicture(data.image);
                 }}
               >
                 <Picture source={picture} imageSize={250} />

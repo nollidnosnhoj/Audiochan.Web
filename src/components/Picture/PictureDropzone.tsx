@@ -1,18 +1,20 @@
 import { Box, chakra, Tooltip, useDisclosure } from "@chakra-ui/react";
-import React from "react";
+import React, { ReactElement } from "react";
 import { useDropzone } from "react-dropzone";
+import { PictureProps } from "~/components/Picture";
 import PictureCropModal from "./PictureCropModal";
 import SETTINGS from "~/constants/settings";
-import { errorToast } from "~/utils/toast";
+import { errorToast, successfulToast } from "~/utils/toast";
+import { isAxiosError } from "~/utils/axios";
+import { ErrorResponse } from "~/lib/types";
 
 interface PictureDropzoneProps {
-  image?: string;
-  onChange: (imageData: string) => void;
+  children: ReactElement<PictureProps>;
+  onChange: (imageData: string) => Promise<void>;
   disabled?: boolean;
 }
 
 const PictureDropzone: React.FC<PictureDropzoneProps> = ({
-  image,
   onChange,
   disabled = false,
   children,
@@ -27,7 +29,6 @@ const PictureDropzone: React.FC<PictureDropzoneProps> = ({
     maxSize: SETTINGS.UPLOAD.IMAGE.maxSize,
     multiple: false,
     onDropAccepted: () => {
-      /** open crop modal */
       openImageCropModal();
     },
     onDropRejected: ([fileRejection]) => {
@@ -44,7 +45,7 @@ const PictureDropzone: React.FC<PictureDropzoneProps> = ({
   return (
     <Box>
       <input {...getInputProps()} />
-      <Tooltip label={image ? "Replace Image" : "Upload Image"}>
+      <Tooltip label={children.props.source ? "Replace Image" : "Upload Image"}>
         <chakra.span
           onClick={() => {
             if (!disabled) open();
@@ -58,8 +59,24 @@ const PictureDropzone: React.FC<PictureDropzoneProps> = ({
         file={acceptedFiles[0]}
         isOpen={isImageCropModalOpen}
         onClose={closeImageCropModal}
-        onCropped={(croppedFile) => {
-          onChange(croppedFile);
+        onCropped={(croppedData) => {
+          onChange(croppedData)
+            .then(() => {
+              successfulToast({
+                title: "Image have successfully changed.",
+              });
+            })
+            .catch((err) => {
+              if (
+                isAxiosError<ErrorResponse>(err) &&
+                err.response?.status === 429
+              ) {
+                errorToast({
+                  title: "Too many requests.",
+                  message: "Try again later.",
+                });
+              }
+            });
         }}
       />
     </Box>
