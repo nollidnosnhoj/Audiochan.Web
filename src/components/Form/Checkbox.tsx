@@ -1,4 +1,12 @@
-import { Checkbox, FormControl, FormLabel, Switch } from "@chakra-ui/react";
+import {
+  Box,
+  Checkbox,
+  FormControl,
+  FormLabel,
+  HStack,
+  Spacer,
+  Switch,
+} from "@chakra-ui/react";
 import React from "react";
 
 interface InputCheckboxProps {
@@ -31,30 +39,37 @@ const InputCheckbox: React.FC<InputCheckboxProps> = ({
       isRequired={required}
       paddingY={2}
     >
-      {label && (
-        <FormLabel htmlFor={name} mb="0">
-          {label}
-        </FormLabel>
-      )}
-      {toggleSwitch ? (
-        <Switch
-          id={name}
-          name={name}
-          disabled={disabled}
-          defaultChecked={value}
-          onChange={onChange}
-        />
-      ) : (
-        <Checkbox
-          id={name}
-          name={name}
-          disabled={disabled}
-          checked={value}
-          onChange={onChange}
-        >
-          {children}
-        </Checkbox>
-      )}
+      <HStack>
+        <Box>
+          {label && (
+            <FormLabel htmlFor={name} mb="0">
+              {label}
+            </FormLabel>
+          )}
+        </Box>
+        <Spacer />
+        <Box>
+          {toggleSwitch ? (
+            <Switch
+              id={name}
+              name={name}
+              disabled={disabled}
+              defaultChecked={value}
+              onChange={onChange}
+            />
+          ) : (
+            <Checkbox
+              id={name}
+              name={name}
+              disabled={disabled}
+              checked={value}
+              onChange={onChange}
+            >
+              {children}
+            </Checkbox>
+          )}
+        </Box>
+      </HStack>
     </FormControl>
   );
 };
