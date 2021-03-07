@@ -46,7 +46,7 @@ export const useAudioFavorite = (audioId: number, initialData?: boolean) => {
 
 export const useCreateAudio = () => {
   const queryClient = useQueryClient();
-  const uploadAudio = async (request: FormData) => {
+  const uploadAudio = async (request: CreateAudioRequest) => {
     const { data } = await api.post<Audio>('audios', request);
     return data;
   }

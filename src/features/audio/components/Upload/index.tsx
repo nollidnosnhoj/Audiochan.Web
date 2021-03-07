@@ -57,7 +57,8 @@ export default function AudioUpload(props: AudioUploadProps) {
           <Flex flex="1" justifyContent="center">
             <Box padding={4} textAlign="center">
               <PictureDropzone
-                onChange={async (data) => {
+                image={picture}
+                onChange={(data) => {
                   setPicture(data);
                 }}
               >
