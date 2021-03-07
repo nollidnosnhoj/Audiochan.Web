@@ -18,6 +18,7 @@ import { successfulToast } from "~/utils/toast";
 import { isAxiosError } from "~/utils/axios";
 import { ErrorResponse } from "~/lib/types";
 import { addAudioPicture } from "../../services/addAudioPicture";
+import { objectToFormData } from "~/utils";
 
 interface AudioUploadingProps {
   file: File;
@@ -113,7 +114,9 @@ export default function AudioUploading(props: AudioUploadingProps) {
             }),
           };
 
-          createAudio(body)
+          const formData = objectToFormData(body);
+
+          createAudio(formData)
             .then(({ id }) => {
               resolve(id);
             })
