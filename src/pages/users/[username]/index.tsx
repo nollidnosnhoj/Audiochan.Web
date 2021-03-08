@@ -62,7 +62,7 @@ export default function ProfilePage() {
 
   const [picture, setPicture] = useState(() => {
     return profile?.picture
-      ? `https://audiochan.s3.amazonaws.com/${profile.picture}`
+      ? `https://audiochan-public.s3.amazonaws.com/${profile.picture}`
       : "";
   });
 

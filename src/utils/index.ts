@@ -45,8 +45,8 @@ export function mapToAudioListProps(audio: Audio): ReactJkMusicPlayerAudioListPr
     audioId: audio.id,
     name: audio.title,
     singer: audio.user.username,
-    cover: `https://audiochan.s3.amazonaws.com/${audio.picture}`,
+    cover: `https://audiochan-public.s3.amazonaws.com/${audio.picture}`,
     duration: audio.duration,
-    musicSrc: `http://audiochan.s3.amazonaws.com/audios/${audio.uploadId}${audio.fileExt}`
+    musicSrc: `http://audiochan-public.s3.amazonaws.com/audios/${audio.uploadId}${audio.fileExt}`
   }
 }

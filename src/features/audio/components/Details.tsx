@@ -68,7 +68,7 @@ const AudioDetails: React.FC<AudioDetailProps> = ({ audio }) => {
 
   const [picture, setPicture] = useState(() => {
     return audio?.picture
-      ? `https://audiochan.s3.amazonaws.com/${audio.picture}`
+      ? `https://audiochan-public.s3.amazonaws.com/${audio.picture}`
       : "";
   });
 

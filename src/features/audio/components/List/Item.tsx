@@ -27,7 +27,7 @@ const AudioListItem: React.FC<AudioListItemProps> = ({
 }) => {
   const picture = useMemo(() => {
     return audio?.picture
-      ? `https://audiochan.s3.amazonaws.com/${audio.picture}`
+      ? `https://audiochan-public.s3.amazonaws.com/${audio.picture}`
       : "";
   }, [audio.picture]);
 
